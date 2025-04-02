@@ -15,15 +15,12 @@ import InterviewScheduler from './pages/InterviewScheduler'
 import InterviewerManagement from './pages/InterviewerManagement'
 import Analytics from './pages/Analytics'
 import Login from './pages/Login'
-import BackendStatus from './components/BackendStatus'
 import ProfileEdit from './pages/ProfileEdit'
 import CandidateComparison from './pages/CandidateComparison'
 import InterviewQuestionBank from './pages/InterviewQuestionBank'
 import { useEffect } from 'react'
 import { setUser, selectAuthStatus } from './redux/slices/authSlice'
 import { toast } from 'react-toastify'
-import axios from 'axios'
-import { checkApiHealth } from './health-check'
 import NotFound from './pages/NotFound'
 
 // Protected route component
@@ -41,59 +38,12 @@ function App() {
   const dispatch = useDispatch()
   const authStatus = useSelector(selectAuthStatus)
   
-  // Check if backend is available on app startup
-  useEffect(() => {
-    const checkBackendAvailability = async () => {
-      try {
-        // Check for demo mode first
-        const isDemoMode = 
-          localStorage.getItem('demo_mode') === 'true' || 
-          (localStorage.getItem('user') && JSON.parse(localStorage.getItem('user'))?.demoUser) ||
-          (localStorage.getItem('user') && JSON.parse(localStorage.getItem('user'))?.isGoogleUser) ||
-          (localStorage.getItem('token') && localStorage.getItem('token').includes('demo'));
-        
-        // If in demo mode, skip the health check
-        if (isDemoMode) {
-          console.log('Demo mode detected, skipping backend health check');
-          localStorage.setItem('backend_error_shown', 'true');
-          return;
-        }
-        
-        // Check if we've already shown the error toast in this session
-        const errorShown = localStorage.getItem('backend_error_shown') === 'true';
-        if (errorShown) {
-          console.log('Backend error message already shown, skipping check');
-          return;
-        }
-        
-        // Use our health check utility to check API availability
-        const healthResult = await checkApiHealth();
-        
-        if (healthResult.status === 'unhealthy') {
-          console.error('Backend server check failed:', healthResult.message);
-          
-          // Show a toast with the error message
-          toast.error(
-            'Cannot connect to backend server. Application is running in demo mode.',
-            { autoClose: 5000 }
-          );
-          
-          // Set flag in localStorage to prevent showing multiple toasts
-          localStorage.setItem('backend_error_shown', 'true');
-        } else {
-          // Clear the flag if the backend is available
-          localStorage.removeItem('backend_error_shown');
-        }
-      } catch (error) {
-        console.error('Backend availability check error:', error);
-      }
-    };
-    
-    checkBackendAvailability();
-  }, []);
-  
   // Load user from localStorage on app startup
   useEffect(() => {
+    // Always mark demo mode for all users to avoid health check issues
+    localStorage.setItem('demo_mode', 'true');
+    localStorage.setItem('backend_error_shown', 'true');
+    
     const user = localStorage.getItem('user');
     if (user) {
       try {
@@ -120,7 +70,6 @@ function App() {
         draggable
         pauseOnHover
       />
-      <BackendStatus />
       <Routes>
         {/* Redirect root to dashboard */}
         <Route

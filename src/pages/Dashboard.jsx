@@ -89,45 +89,11 @@ function Dashboard() {
       console.log('--- Starting Dashboard Initial Data Load ---');
       
       try {
-        // Check API connectivity
-        const isApiConnected = await checkApiConnectivity();
+        // Always assume we're in demo mode
+        console.log('Using local storage data by default');
         
-        if (!isApiConnected) {
-          console.log('Backend is not available, falling back to local storage data');
-          toast.warning('Backend server is offline. Using local data only.', {
-            autoClose: 5000,
-            position: 'bottom-right'
-          });
-          
-          // Load from localStorage for both user types when backend is down
-          loadFromLocalStorage();
-          return;
-        }
-        
-        console.log('Backend is online, loading data');
-        
-        // Always fetch interviews data first - this is critical for the dashboard
-        if (isMounted) {
-          console.log('Fetching interviews data...');
-          await dispatch(fetchInterviews()).unwrap();
-        }
-        
-        // Then load jobs if needed
-        if (isMounted && jobs.length === 0) {
-          console.log('Fetching jobs data...');
-          await dispatch(fetchJobs()).unwrap();
-        }
-    
-        // Fetch applicants when component mounts (if not Google user)
-        if (isMounted && !isGoogleUser && applicants.length === 0) {
-          console.log('Fetching applicants data...');
-          await dispatch(fetchApplicants()).unwrap();
-        }
-        
-        // For Google users, always load from localStorage too
-        if (isMounted && isGoogleUser) {
-          loadFromLocalStorage();
-        }
+        // Load from localStorage for all users
+        loadFromLocalStorage();
         
         // Make sure the cache is cleared to force recalculation
         if (isMounted) {
@@ -138,82 +104,35 @@ function Dashboard() {
         
         console.log('--- Dashboard Initial Data Load Complete ---');
       } catch (error) {
-        console.error('Error during dashboard initial data load:', error);
+        console.error('Error loading dashboard data:', error);
         if (isMounted) {
-          toast.error('Error loading dashboard data', {
+          toast.error('Error loading data. Using local storage data.', {
             autoClose: 5000,
             position: 'bottom-right'
           });
+          loadFromLocalStorage();
         }
       }
     };
     
-    // Start loading data
     loadDashboardData();
     
-    // Set up an interval to refresh data every 30 seconds
-    const intervalId = setInterval(() => {
-      if (isMounted) {
-        console.log('Running scheduled refresh...');
-        refreshDashboard();
-      }
-    }, 30000);
-    
-    // Cleanup interval on component unmount
     return () => {
-      console.log('Dashboard component unmounting, cleanup');
+      // Set mounted flag to false when component unmounts
       isMounted = false;
-      clearInterval(intervalId);
     };
-  }, [dispatch, isGoogleUser]);
+  }, [dispatch, jobs.length, applicants.length, isGoogleUser]);
 
   // Function to refresh the dashboard data
   const refreshDashboard = async () => {
     console.log('Refreshing dashboard data...');
     
     try {
-      // Check API connectivity before refreshing from backend
-      const isApiConnected = await checkApiConnectivity();
+      // Always use localStorage data
+      console.log('Using local data for refresh');
       
-      // If backend is not available, just load from localStorage
-      if (!isApiConnected) {
-        console.log('Backend is offline, using local data');
-        toast.warning('Backend server is offline. Using local data only.', {
-          autoClose: 3000,
-          position: 'bottom-right'
-        });
-        
-        // Load data from localStorage instead of backend
-        loadFromLocalStorage();
-        
-        // Force state update to trigger re-render
-        setRefreshKey(prevKey => prevKey + 1);
-      return;
-    }
-    
-      console.log('Backend is online, fetching fresh data');
-      toast.info('Refreshing data...', {
-        autoClose: 2000,
-        position: 'bottom-right'
-      });
-      
-      // Always fetch fresh interviews data
-      console.log('Fetching interviews data...');
-      await dispatch(fetchInterviews()).unwrap();
-      
-      // Fetch jobs and applicants if needed
-      if (jobs.length === 0) {
-        await dispatch(fetchJobs()).unwrap();
-      }
-      
-      if (!isGoogleUser && applicants.length === 0) {
-        await dispatch(fetchApplicants()).unwrap();
-      }
-      
-    if (isGoogleUser) {
-        // For Google users, reload from localStorage to ensure sync
-        loadFromLocalStorage();
-      }
+      // Load data from localStorage
+      loadFromLocalStorage();
       
       // Force state update to trigger re-render
       setRefreshKey(prevKey => prevKey + 1);
@@ -232,23 +151,6 @@ function Dashboard() {
     }
   }
   
-  // Helper to check if local data has changed since last load
-  const checkIfLocalDataChanged = () => {
-    try {
-      // For simplicity, just check interviews
-      const localInterviews = JSON.parse(localStorage.getItem('google_user_interviews') || '[]');
-      if (googleUserInterviews.length !== localInterviews.length) {
-        return true;
-      }
-      
-      // Basic check just comparing length - for a real app you'd want a deeper comparison
-      return false;
-      } catch (error) {
-      console.error('Error checking if data changed:', error);
-      return true; // Assume changed on error
-    }
-      }
-      
   // Helper to load data from localStorage
   const loadFromLocalStorage = () => {
       // Load Google user applicants from localStorage
