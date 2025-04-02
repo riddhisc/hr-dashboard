@@ -1,5 +1,6 @@
 {
   "rewrites": [
+    { "source": "/api/health-check", "destination": "/api-health-mock.json" },
     { "source": "/api/:path*", "destination": "https://hr-dashboard-backend.onrender.com/api/:path*" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],

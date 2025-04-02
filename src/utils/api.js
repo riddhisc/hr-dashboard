@@ -3,25 +3,40 @@ import axios from 'axios';
 // Using environment variable for API URL when available, falling back to proxy
 export const API_URL = import.meta.env.VITE_API_URL || '/api';
 
-// Check if user is in demo mode
+// Check if user is in demo mode - in production this should always be true
 export const isInDemoMode = () => {
+  // Force demo mode if environment variable is set
+  if (import.meta.env.VITE_FORCE_DEMO_MODE === 'true') {
+    return true;
+  }
+  
   try {
+    // First check if demo_mode was manually set
+    if (localStorage.getItem('demo_mode') === 'true') {
+      return true;
+    }
+    
+    // Then check for demo user flags
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     return user.email?.includes('demo') || 
           user.email?.includes('google') || 
           user.provider === 'google' ||
           user.demoUser === true ||
+          user.isGoogleUser === true ||
           // Additional checks for demo token
           (localStorage.getItem('token') || '').includes('demo') ||
           (localStorage.getItem('token') || '').includes('mock');
   } catch (error) {
     console.error('Error checking demo mode:', error);
-    return false;
+    return true; // Default to true in case of errors
   }
 };
 
-// Flag to control mock data usage - use mock data for demo users
-export const USE_MOCK_DATA = isInDemoMode();
+// Flag to control mock data usage - override with environment variable in production
+export const USE_MOCK_DATA = 
+  import.meta.env.VITE_USE_MOCK_DATA === 'true' ? 
+  true : 
+  isInDemoMode();
 
 console.log('API Configuration:', {
   API_URL,
