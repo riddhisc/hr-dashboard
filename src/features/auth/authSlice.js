@@ -72,50 +72,63 @@ export const login = createAsyncThunk(
   }
 );
 
-// Google Login
+// Google Login - Demo Mode Only (No Backend Call)
 export const googleLogin = createAsyncThunk(
   'auth/googleLogin',
   async (credential, { rejectWithValue }) => {
     try {
-      console.log('Attempting Google login with credential');
-      console.log('Credential type:', typeof credential);
-      console.log('Credential length:', credential.length);
-      console.log('Credential first 20 chars:', credential.substring(0, 20));
-
-      const response = await authAPI.googleLogin(credential);
-      console.log('Google login response:', response.data);
+      console.log('Creating demo Google user - no API call');
       
-      // Validate response data
-      if (!response.data) {
-        console.error('Invalid response from server');
-        return rejectWithValue('Invalid response from server');
-      }
+      // Create a mock Google user for demo mode
+      const mockGoogleUser = {
+        _id: 'google_user_' + Date.now(),
+        name: 'Demo Google User',
+        email: 'google.user.' + Date.now() + '@example.com',
+        isGoogleUser: true,
+        provider: 'google',
+        demoUser: true,
+        token: 'mock_google_token_' + Date.now()
+      };
       
       // Store user in localStorage
-      localStorage.setItem('user', JSON.stringify(response.data));
-      localStorage.setItem('token', response.data.token);
-      return response.data;
+      localStorage.setItem('user', JSON.stringify(mockGoogleUser));
+      localStorage.setItem('token', mockGoogleUser.token);
+      
+      // Initialize demo data in localStorage
+      initializeDemoData();
+      
+      // Return the mock user
+      return mockGoogleUser;
     } catch (error) {
-      console.group('Google Login Error');
-      console.error('Comprehensive Google login error:', {
-        name: error.name,
-        message: error.message,
-        stack: error.stack,
-        response: error.response,
-        data: error.response?.data
-      });
-      console.groupEnd();
-
-      // Provide a more specific error message
-      const errorMessage = 
-        error.response?.data?.message || 
-        error.message || 
-        'Google login failed. Please try again.';
-
-      return rejectWithValue(errorMessage);
+      console.error('Error creating demo Google user:', error);
+      return rejectWithValue('Failed to create demo Google user.');
     }
   }
 );
+
+// Helper function to initialize demo data
+function initializeDemoData() {
+  if (!localStorage.getItem('demoDataInitialized')) {
+    console.log('Initializing demo data in localStorage...');
+    const demoJobs = [
+      { _id: 'demo_job_1', title: 'Frontend Developer', status: 'open', applications: 5, createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString() },
+      { _id: 'demo_job_2', title: 'Backend Developer', status: 'open', applications: 3, createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString() },
+      { _id: 'demo_job_3', title: 'UI/UX Designer', status: 'closed', applications: 8, createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString() }
+    ];
+    const demoApplicants = [
+      { _id: 'demo_applicant_1', name: 'John Doe', jobId: 'demo_job_1', status: 'applied', createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString() },
+      { _id: 'demo_applicant_2', name: 'Jane Smith', jobId: 'demo_job_2', status: 'interview', createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString() }
+    ];
+    const demoInterviews = [
+      { _id: 'demo_interview_1', applicantId: 'demo_applicant_1', jobId: 'demo_job_1', date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], time: '10:00 AM', status: 'scheduled', interviewers: ['Demo Interviewer 1'] },
+      { _id: 'demo_interview_2', applicantId: 'demo_applicant_2', jobId: 'demo_job_2', date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], time: '2:00 PM', status: 'pending', interviewers: ['Demo Interviewer 2'] }
+    ];
+    localStorage.setItem('demoJobs', JSON.stringify(demoJobs));
+    localStorage.setItem('demoApplicants', JSON.stringify(demoApplicants));
+    localStorage.setItem('demoInterviews', JSON.stringify(demoInterviews));
+    localStorage.setItem('demoDataInitialized', 'true');
+  }
+}
 
 // Get user profile
 export const getUserProfile = createAsyncThunk(

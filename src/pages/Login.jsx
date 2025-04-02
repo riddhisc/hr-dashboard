@@ -1,18 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { login, googleLogin, clearError } from '../features/auth/authSlice';
+import { login, clearError } from '../features/auth/authSlice';
 import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
-import { GoogleLogin } from '@react-oauth/google';
-
-// Get the Google Client ID from environment variables
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-const USE_MOCK_DATA = import.meta.env.VITE_USE_MOCK_DATA === 'true' || false;
-
-console.log('Google OAuth Configuration:', { 
-  clientId: GOOGLE_CLIENT_ID, 
-  mockDataEnabled: USE_MOCK_DATA 
-});
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -20,167 +10,103 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   
-  const { user, isAuthenticated, status, error } = useSelector((state) => state.auth);
+  const { isAuthenticated, status, error } = useSelector((state) => state.auth);
   
   useEffect(() => {
-    // If user is already authenticated, redirect to dashboard
     if (isAuthenticated) {
       navigate('/dashboard');
     }
-    
-    // Clear any previous errors when component mounts
     dispatch(clearError());
   }, [isAuthenticated, navigate, dispatch]);
   
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(login({ email, password }));
+    
+    // Check for demo credentials
+    if (email === 'admin@example.com' && password === 'password123') {
+      console.log('Using demo credentials');
+      
+      // Create a mock user
+      const mockUser = {
+        _id: 'demo_user_' + Date.now(),
+        name: 'Demo Admin',
+        email: 'admin@example.com',
+        role: 'admin',
+        demoUser: true,
+        token: 'demo_token_' + Date.now()
+      };
+      
+      // Store in localStorage
+      localStorage.setItem('user', JSON.stringify(mockUser));
+      localStorage.setItem('token', mockUser.token);
+      
+      // Initialize demo data
+      initializeDemoData();
+      
+      // Navigate to dashboard
+      navigate('/dashboard');
+      return;
+    }
+
+    // Regular login for non-demo credentials
+    try {
+      dispatch(login({ email, password }));
+    } catch (error) {
+      console.error('Login failed, suggest using demo account:', error);
+      // Show error message suggesting to use demo account if real login fails
+      dispatch({ 
+        type: 'auth/loginFailed', 
+        payload: 'Login failed. Please check your credentials or try the demo account.'
+      });
+    }
   };
 
-  const handleDemoLogin = (e) => {
-    e.preventDefault();
-    console.log('Using demo login');
+  // Simple Google login simulation that works reliably
+  const handleGoogleLogin = () => {
+    console.log('Simulating Google login for demo mode');
     
-    // Create a mock user for demo purposes
-    const mockUser = {
-      _id: 'demo_user_123456789',
-      name: 'Demo User',
-      email: 'demo.user@example.com',
-      demoUser: true,
-      provider: 'local'
-    };
-    
-    // Store in localStorage and update auth state
-    localStorage.setItem('user', JSON.stringify(mockUser));
-    localStorage.setItem('token', 'mock_demo_token_123456789');
-    
-    // Initialize demo data in localStorage
-    initializeDemoData();
-    
-    // Redirect to dashboard
-    navigate('/dashboard');
-  };
-
-  const handleGoogleSuccess = (credentialResponse) => {
-    console.log('Google login successful:', credentialResponse);
-    
-    // Create a mock user for Google sign-in
+    // Create a mock Google user
     const mockGoogleUser = {
       _id: 'google_user_' + Date.now(),
-      name: 'Google User',
-      email: 'google.user@example.com',
+      name: 'Demo Google User',
+      email: 'google.user.' + Date.now() + '@example.com',
       isGoogleUser: true,
       provider: 'google',
-      demoUser: true
+      demoUser: true,
+      token: 'mock_google_token_' + Date.now()
     };
     
     // Store in localStorage
     localStorage.setItem('user', JSON.stringify(mockGoogleUser));
-    localStorage.setItem('token', 'mock_google_token_' + Date.now());
+    localStorage.setItem('token', mockGoogleUser.token);
     
-    // Initialize demo data in localStorage
+    // Initialize demo data
     initializeDemoData();
     
-    // Redirect to dashboard
-    navigate('/dashboard');
-  };
-
-  const handleGoogleError = (errorResponse) => {
-    console.error('Google login error:', errorResponse);
-    alert('Google login failed. Please try the Demo User option instead.');
+    // Navigate to dashboard
+        navigate('/dashboard');
   };
 
   // Initialize demo data in localStorage
   const initializeDemoData = () => {
-    // Check if demo data already exists
     if (!localStorage.getItem('demoDataInitialized')) {
-      // Initialize jobs
+      console.log('Initializing demo data in localStorage...');
       const demoJobs = [
-        {
-          _id: 'demo_job_1',
-          title: 'Frontend Developer',
-          description: 'We are looking for a skilled Frontend Developer...',
-          location: 'Remote',
-          status: 'open',
-          department: 'Engineering',
-          skills: ['React', 'JavaScript', 'CSS'],
-          createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-          applications: 5
-        },
-        {
-          _id: 'demo_job_2',
-          title: 'Backend Developer',
-          description: 'Experienced Backend Developer needed...',
-          location: 'Hybrid',
-          status: 'open',
-          department: 'Engineering',
-          skills: ['Node.js', 'Express', 'MongoDB'],
-          createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
-          applications: 3
-        },
-        {
-          _id: 'demo_job_3',
-          title: 'UI/UX Designer',
-          description: 'Creative UI/UX Designer to join our team...',
-          location: 'Onsite',
-          status: 'closed',
-          department: 'Design',
-          skills: ['Figma', 'Adobe XD', 'UI Design'],
-          createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-          applications: 8
-        }
+        { _id: 'demo_job_1', title: 'Frontend Developer', status: 'open', applications: 5, createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString() },
+        { _id: 'demo_job_2', title: 'Backend Developer', status: 'open', applications: 3, createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString() },
+        { _id: 'demo_job_3', title: 'UI/UX Designer', status: 'closed', applications: 8, createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString() }
+      ];
+      const demoApplicants = [
+        { _id: 'demo_applicant_1', name: 'John Doe', jobId: 'demo_job_1', status: 'applied', createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString() },
+        { _id: 'demo_applicant_2', name: 'Jane Smith', jobId: 'demo_job_2', status: 'interview', createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString() }
+      ];
+      const demoInterviews = [
+        { _id: 'demo_interview_1', applicantId: 'demo_applicant_1', jobId: 'demo_job_1', date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], time: '10:00 AM', status: 'scheduled', interviewers: ['Demo Interviewer 1'] },
+        { _id: 'demo_interview_2', applicantId: 'demo_applicant_2', jobId: 'demo_job_2', date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], time: '2:00 PM', status: 'pending', interviewers: ['Demo Interviewer 2'] }
       ];
       localStorage.setItem('demoJobs', JSON.stringify(demoJobs));
-      
-      // Initialize applicants
-      const demoApplicants = [
-        {
-          _id: 'demo_applicant_1',
-          name: 'John Doe',
-          email: 'john.doe@example.com',
-          phone: '123-456-7890',
-          jobId: 'demo_job_1',
-          status: 'applied',
-          createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString()
-        },
-        {
-          _id: 'demo_applicant_2',
-          name: 'Jane Smith',
-          email: 'jane.smith@example.com',
-          phone: '987-654-3210',
-          jobId: 'demo_job_2',
-          status: 'interview',
-          createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString()
-        }
-      ];
       localStorage.setItem('demoApplicants', JSON.stringify(demoApplicants));
-      
-      // Initialize interviews
-      const demoInterviews = [
-        {
-          _id: 'demo_interview_1',
-          applicantId: 'demo_applicant_1',
-          jobId: 'demo_job_1',
-          date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          time: '10:00 AM',
-          duration: 60,
-          status: 'scheduled',
-          interviewers: ['Demo Interviewer 1']
-        },
-        {
-          _id: 'demo_interview_2',
-          applicantId: 'demo_applicant_2',
-          jobId: 'demo_job_2',
-          date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          time: '2:00 PM',
-          duration: 45,
-          status: 'pending',
-          interviewers: ['Demo Interviewer 2', 'Demo Interviewer 3']
-        }
-      ];
       localStorage.setItem('demoInterviews', JSON.stringify(demoInterviews));
-      
-      // Mark as initialized
       localStorage.setItem('demoDataInitialized', 'true');
     }
   };
@@ -247,7 +173,7 @@ const Login = () => {
             <button
               type="submit"
               disabled={status === 'loading'}
-              className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 ${
+              className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
                 status === 'loading' ? 'opacity-70 cursor-not-allowed' : ''
               }`}
             >
@@ -266,26 +192,31 @@ const Login = () => {
           <div className="flex flex-col items-center justify-center space-y-4">
             <div className="text-sm">
               <span className="text-gray-500">Or continue with</span>
-            </div>
-            
+          </div>
+          
             <div className="flex space-x-4">
-              <div id="googleLoginButton">
-                <GoogleLogin
-                  onSuccess={handleGoogleSuccess}
-                  onError={handleGoogleError}
-                  useOneTap
-                />
-              </div>
-            </div>
-            
-            <div className="pt-2">
+              {/* Custom Google button that works reliably */}
               <button
+                onClick={handleGoogleLogin}
                 type="button"
-                onClick={handleDemoLogin}
-                className="py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
               >
-                Try Demo Account
+                <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <g transform="matrix(1, 0, 0, 1, 27.009001, -39.238998)">
+                    <path fill="#4285F4" d="M -3.264 51.509 C -3.264 50.719 -3.334 49.969 -3.454 49.239 L -14.754 49.239 L -14.754 53.749 L -8.284 53.749 C -8.574 55.229 -9.424 56.479 -10.684 57.329 L -10.684 60.329 L -6.824 60.329 C -4.564 58.239 -3.264 55.159 -3.264 51.509 Z"/>
+                    <path fill="#34A853" d="M -14.754 63.239 C -11.514 63.239 -8.804 62.159 -6.824 60.329 L -10.684 57.329 C -11.764 58.049 -13.134 58.489 -14.754 58.489 C -17.884 58.489 -20.534 56.379 -21.484 53.529 L -25.464 53.529 L -25.464 56.619 C -23.494 60.539 -19.444 63.239 -14.754 63.239 Z"/>
+                    <path fill="#FBBC05" d="M -21.484 53.529 C -21.734 52.809 -21.864 52.039 -21.864 51.239 C -21.864 50.439 -21.724 49.669 -21.484 48.949 L -21.484 45.859 L -25.464 45.859 C -26.284 47.479 -26.754 49.299 -26.754 51.239 C -26.754 53.179 -26.284 54.999 -25.464 56.619 L -21.484 53.529 Z"/>
+                    <path fill="#EA4335" d="M -14.754 43.989 C -12.984 43.989 -11.404 44.599 -10.154 45.789 L -6.734 42.369 C -8.804 40.429 -11.514 39.239 -14.754 39.239 C -19.444 39.239 -23.494 41.939 -25.464 45.859 L -21.484 48.949 C -20.534 46.099 -17.884 43.989 -14.754 43.989 Z"/>
+                  </g>
+                </svg>
+                Sign in with Google
               </button>
+          </div>
+          
+            <div className="text-center pt-2">
+              <p className="text-sm text-gray-600">
+                Demo credentials: <span className="font-medium">admin@example.com / password123</span>
+              </p>
             </div>
           </div>
         </form>

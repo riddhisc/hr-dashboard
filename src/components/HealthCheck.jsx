@@ -71,18 +71,38 @@ const HealthCheck = () => {
     );
   }
 
+  // Display demo mode notice if applicable
+  const isDemoMode = healthStatus?.demoMode;
+
   return (
     <div className="p-4 bg-white rounded-lg shadow">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-medium">System Health</h2>
-        <span className={`px-2 py-1 text-xs rounded-full ${getStatusBadgeColor(healthStatus?.overall)}`}>
-          {healthStatus?.overall || 'Unknown'}
-        </span>
+        <h2 className="text-lg font-medium">System Status</h2>
+        {isDemoMode ? (
+          <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
+            Demo Mode
+          </span>
+        ) : (
+          <span className={`px-2 py-1 text-xs rounded-full ${getStatusBadgeColor(healthStatus?.overall)}`}>
+            {healthStatus?.overall || 'Unknown'}
+          </span>
+        )}
       </div>
+
+      {isDemoMode && (
+        <div className="mb-4 p-4 bg-blue-50 border border-blue-200 text-blue-800 rounded-md">
+          <div className="font-semibold mb-1">Demo Mode Active</div>
+          <div className="text-sm">
+            Application is running with local data only. No backend connection required.
+            <br/>
+            All data is stored in your browser's localStorage.
+          </div>
+        </div>
+      )}
 
       <div className="space-y-3">
         {healthStatus?.checks && Object.entries(healthStatus.checks).map(([name, check]) => (
-          <div key={name} className="border rounded-md p-3">
+          <div key={name} className={`border rounded-md p-3 ${isDemoMode && name === 'api' ? 'opacity-60' : ''}`}>
             <div className="flex justify-between items-center">
               <div className="font-medium capitalize">{name}</div>
               <span className={`px-2 py-1 text-xs rounded-full ${getStatusBadgeColor(check.status)}`}>

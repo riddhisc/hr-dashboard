@@ -21,7 +21,6 @@ import CandidateComparison from './pages/CandidateComparison'
 import InterviewQuestionBank from './pages/InterviewQuestionBank'
 import { useEffect } from 'react'
 import { setUser, selectAuthStatus } from './redux/slices/authSlice'
-import { GoogleOAuthProvider } from '@react-oauth/google'
 import { toast } from 'react-toastify'
 import axios from 'axios'
 import { checkApiHealth } from './health-check'
@@ -61,7 +60,7 @@ function App() {
           
           // Show a toast with the error message
           toast.error(
-            'Cannot connect to backend server. Please ensure the backend server is running on port 5000.',
+            'Cannot connect to backend server. Application is running in demo mode.',
             { autoClose: 5000 }
           );
           
