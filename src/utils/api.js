@@ -3,12 +3,22 @@ import axios from 'axios';
 // Using environment variable for API URL when available, falling back to proxy
 const API_URL = import.meta.env.VITE_API_URL || '/api';
 
-// Flag to control mock data usage - prioritize env variable and default to false
-const USE_MOCK_DATA = false; // Force using backend data
+// Check if user is in demo mode
+const isInDemoMode = () => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return user.email?.includes('demo') || 
+         user.email?.includes('google') || 
+         user.provider === 'google' ||
+         user.demoUser === true;
+};
+
+// Flag to control mock data usage - use mock data for demo users
+const USE_MOCK_DATA = isInDemoMode();
 
 console.log('API Configuration:', {
   API_URL,
   USE_MOCK_DATA,
+  isDemoUser: isInDemoMode(),
   NODE_ENV: import.meta.env.MODE || 'development'
 });
 

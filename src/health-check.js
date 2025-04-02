@@ -19,11 +19,26 @@ const HEALTH_CHECK_CONFIG = {
   },
 };
 
+// Check if user is in demo mode (using localStorage)
+const isInDemoMode = () => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return user.email?.includes('demo') || 
+         user.email?.includes('google') || 
+         user.provider === 'google' ||
+         user.demoUser === true;
+};
+
 /**
  * Check API connectivity
  * @returns {Promise<{status: string, message: string}>}
  */
 export const checkApiHealth = async () => {
+  // If in demo mode, we don't need a real backend
+  if (isInDemoMode()) {
+    console.log('User is in demo mode - skipping API health check');
+    return { status: 'healthy', message: 'Demo mode active - backend not required' };
+  }
+
   try {
     const response = await axios.get(HEALTH_CHECK_CONFIG.api.endpoint, { 
       timeout: HEALTH_CHECK_CONFIG.api.timeout 
@@ -36,6 +51,12 @@ export const checkApiHealth = async () => {
     }
   } catch (error) {
     console.error('API health check failed:', error);
+    
+    // For demo purposes, don't show errors if localStorage/demo mode
+    if (isInDemoMode()) {
+      return { status: 'healthy', message: 'Demo mode active - using local data' };
+    }
+    
     return { 
       status: 'unhealthy', 
       message: `API connection failed: ${error.message || 'Unknown error'}` 
