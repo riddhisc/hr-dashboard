@@ -1,3 +1,6 @@
+// Import health check disabler first to ensure it patches axios before any other code runs
+import './disableHealthCheck.js';
+
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { Provider } from 'react-redux'
