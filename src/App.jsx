@@ -45,6 +45,20 @@ function App() {
   useEffect(() => {
     const checkBackendAvailability = async () => {
       try {
+        // Check for demo mode first
+        const isDemoMode = 
+          localStorage.getItem('demo_mode') === 'true' || 
+          (localStorage.getItem('user') && JSON.parse(localStorage.getItem('user'))?.demoUser) ||
+          (localStorage.getItem('user') && JSON.parse(localStorage.getItem('user'))?.isGoogleUser) ||
+          (localStorage.getItem('token') && localStorage.getItem('token').includes('demo'));
+        
+        // If in demo mode, skip the health check
+        if (isDemoMode) {
+          console.log('Demo mode detected, skipping backend health check');
+          localStorage.setItem('backend_error_shown', 'true');
+          return;
+        }
+        
         // Check if we've already shown the error toast in this session
         const errorShown = localStorage.getItem('backend_error_shown') === 'true';
         if (errorShown) {

@@ -9,11 +9,19 @@ import axios from 'axios';
 // Detect demo mode as early as possible - even before any checks run
 const isDemoMode = () => {
   try {
+    // First check for demo_mode flag
+    if (localStorage.getItem('demo_mode') === 'true') {
+      console.log('Demo mode flag found in localStorage');
+      return true;
+    }
+    
+    // Then check user object
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     return user.email?.includes('demo') || 
            user.email?.includes('google') || 
            user.provider === 'google' ||
            user.demoUser === true ||
+           user.isGoogleUser === true ||
            // Add additional check for demo token pattern
            (localStorage.getItem('token') || '').includes('demo') ||
            (localStorage.getItem('token') || '').includes('mock');

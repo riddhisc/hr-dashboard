@@ -14,23 +14,29 @@ const BackendStatus = () => {
   useEffect(() => {
     const checkBackend = async () => {
       try {
-        // Check if we're in demo mode by looking at localStorage
+        // Check if we're in demo mode using multiple methods
+        const demoModeFlag = localStorage.getItem('demo_mode') === 'true';
         const user = JSON.parse(localStorage.getItem('user') || '{}');
-        const isDemoMode = user.email?.includes('demo') || 
+        const isDemoMode = demoModeFlag ||
+                          user.email?.includes('demo') || 
                           user.email?.includes('google') || 
                           user.provider === 'google' ||
                           user.demoUser === true ||
-                          (localStorage.getItem('token') || '').includes('demo');
+                          user.isGoogleUser === true ||
+                          (localStorage.getItem('token') || '').includes('demo') ||
+                          (localStorage.getItem('token') || '').includes('mock');
         
-        // In demo mode, don't show error messages about backend connectivity
+        // Skip health check for demo users
         if (isDemoMode) {
+          console.log('Demo mode detected in BackendStatus, not showing connectivity errors');
           setStatus('healthy');
-          setMessage('Cannot connect to backend server. Application is running in demo mode.');
-          // Hide message after 5 seconds in demo mode
-          setTimeout(() => setVisible(false), 5000);
+          setMessage('Application is running in demo mode with local data.');
+          // Hide message quickly for demo users
+          setTimeout(() => setVisible(false), 3000);
           return;
         }
 
+        // Only perform health check for non-demo users
         const result = await checkApiHealth();
         
         if (result.status === 'healthy') {
@@ -40,12 +46,12 @@ const BackendStatus = () => {
           setTimeout(() => setVisible(false), 3000);
         } else {
           setStatus('unhealthy');
-          setMessage('Cannot connect to backend server. Application is running in demo mode.');
+          setMessage('Cannot connect to backend server. Use demo account for best experience.');
         }
       } catch (error) {
         console.error('Backend server check failed:', error.message);
         setStatus('unhealthy');
-        setMessage('Cannot connect to backend server. Application is running in demo mode.');
+        setMessage('Cannot connect to backend server. Use demo account for best experience.');
       }
     };
 

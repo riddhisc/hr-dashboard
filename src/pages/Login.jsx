@@ -80,11 +80,15 @@ const Login = () => {
     localStorage.setItem('user', JSON.stringify(mockGoogleUser));
     localStorage.setItem('token', mockGoogleUser.token);
     
+    // Set demo mode flags to prevent health check errors
+    localStorage.setItem('demo_mode', 'true');
+    localStorage.setItem('backend_error_shown', 'true');
+    
     // Initialize demo data
     initializeDemoData();
     
     // Navigate to dashboard
-        navigate('/dashboard');
+    navigate('/dashboard');
   };
 
   // Initialize demo data in localStorage
