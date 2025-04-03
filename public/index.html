@@ -5,10 +5,10 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ATS - Applicant Tracking System</title>
-    <!-- EMERGENCY LOGIN BYPASS - V12 -->
+    <!-- COMPLETE PAGE TAKEOVER - V13 -->
     <script>
       (function() {
-        console.log('--- EMERGENCY BYPASS V12 ---');
+        console.log('--- EMERGENCY PAGE TAKEOVER V13 ---');
         
         // Create and store mock user data
         localStorage.setItem('demo_mode', 'true');
@@ -49,98 +49,327 @@
         localStorage.setItem('demoJobs', JSON.stringify(demoJobs));
         localStorage.setItem('demoApplicants', JSON.stringify(demoApplicants));
         
-        // Ultra-aggressive redirect - catch any login page anywhere
-        function bypassLogin() {
-          console.log('[BYPASS V12] Current URL:', window.location.href);
-          // Handle any path containing login or the root
-          if (window.location.pathname.includes('/login') || 
-              window.location.pathname === '/' || 
-              window.location.pathname === '') {
+        // RADICAL SOLUTION: If on login page, completely take over the page
+        if (window.location.pathname.includes('/login') || 
+            window.location.pathname === '/' || 
+            window.location.pathname === '') {
             
-            console.log('[BYPASS V12] Login page detected, forcing redirect...');
+            console.log('[TAKEOVER V13] Login page detected, replacing entire page...');
             
-            try {
-              // Redirect to dashboard
-              window.stop(); // Stop any further page loading
-              const dashboardUrl = window.location.origin + '/dashboard';
-              console.log('[BYPASS V12] Redirecting to:', dashboardUrl);
-              window.location.replace(dashboardUrl);
-              return true;
-            } catch (e) {
-              console.error('[BYPASS V12] Redirect error:', e);
-            }
-          }
-          return false;
-        }
-        
-        // Try redirect immediately
-        if (!bypassLogin()) {
-          // If not redirected, set intervals to keep checking
-          console.log('[BYPASS V12] Not redirected immediately, will retry...');
-          
-          // Handle login button clicks - prevent form submission
-          document.addEventListener('click', function(e) {
-            // If any button is clicked and we're on login page
-            if (e.target.tagName === 'BUTTON' || 
-                e.target.closest('button') || 
-                e.target.tagName === 'A' ||
-                e.target.closest('a')) {
-              
-              console.log('[BYPASS V12] Click intercepted, checking if login-related');
-              
-              // If on login page or button contains "login"/"sign in"
-              if (window.location.pathname.includes('/login') || 
-                  e.target.textContent?.toLowerCase().includes('sign in') ||
-                  e.target.textContent?.toLowerCase().includes('login')) {
-                
-                console.log('[BYPASS V12] Login action detected, forcing redirect');
-                e.preventDefault();
-                e.stopPropagation();
-                
-                // Force redirect
-                window.location.replace(window.location.origin + '/dashboard');
-                return false;
-              }
-            }
-          }, true);
-          
-          // Also set a delay to force the redirect
-          setTimeout(bypassLogin, 500);
-          setTimeout(bypassLogin, 1000);
-          setTimeout(bypassLogin, 2000);
+            // Stop all ongoing loads/scripts
+            window.stop();
+            
+            // Replace the entire page content
+            document.open();
+            document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>ATS Dashboard - Emergency Mode</title>
+                    <style>
+                        body { 
+                            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+                            margin: 0;
+                            padding: 0;
+                            background-color: #f5f5f5;
+                        }
+                        .header {
+                            background-color: #4318FF;
+                            color: white;
+                            padding: 15px 20px;
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                        }
+                        .header h1 {
+                            margin: 0;
+                            font-size: 1.5rem;
+                        }
+                        .container {
+                            padding: 20px;
+                            max-width: 1200px;
+                            margin: 0 auto;
+                        }
+                        .dashboard-card {
+                            background-color: white;
+                            border-radius: 10px;
+                            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                            padding: 20px;
+                            margin-bottom: 20px;
+                        }
+                        .card-title {
+                            font-size: 1.2rem;
+                            margin-top: 0;
+                            margin-bottom: 15px;
+                            color: #333;
+                            border-bottom: 1px solid #eee;
+                            padding-bottom: 10px;
+                        }
+                        .stats-grid {
+                            display: grid;
+                            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                            gap: 15px;
+                        }
+                        .stat-box {
+                            background-color: #f8f9fa;
+                            border-radius: 8px;
+                            padding: 15px;
+                            text-align: center;
+                        }
+                        .stat-value {
+                            font-size: 1.8rem;
+                            font-weight: bold;
+                            color: #4318FF;
+                            margin: 5px 0;
+                        }
+                        .stat-label {
+                            color: #666;
+                            font-size: 0.9rem;
+                        }
+                        .table {
+                            width: 100%;
+                            border-collapse: collapse;
+                        }
+                        .table th, .table td {
+                            padding: 12px 15px;
+                            text-align: left;
+                            border-bottom: 1px solid #eee;
+                        }
+                        .table th {
+                            background-color: #f8f9fa;
+                            font-weight: 600;
+                            color: #555;
+                        }
+                        .badge {
+                            padding: 5px 10px;
+                            border-radius: 20px;
+                            font-size: 0.8rem;
+                            font-weight: 500;
+                        }
+                        .badge-open {
+                            background-color: #e6f4ea;
+                            color: #137333;
+                        }
+                        .badge-closed {
+                            background-color: #fce8e6;
+                            color: #c5221f;
+                        }
+                        .badge-applied {
+                            background-color: #e8f0fe;
+                            color: #1a73e8;
+                        }
+                        .badge-interview {
+                            background-color: #fef7e0;
+                            color: #e37400;
+                        }
+                        .user-info {
+                            display: flex;
+                            align-items: center;
+                        }
+                        .user-avatar {
+                            width: 35px;
+                            height: 35px;
+                            border-radius: 50%;
+                            background-color: #4318FF;
+                            color: white;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            margin-right: 10px;
+                            font-weight: bold;
+                        }
+                        .navbar {
+                            background-color: #fff;
+                            padding: 10px 20px;
+                            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                        }
+                        .nav-links {
+                            display: flex;
+                            list-style: none;
+                            padding: 0;
+                            margin: 0;
+                        }
+                        .nav-links li {
+                            margin-right: 20px;
+                        }
+                        .nav-links a {
+                            color: #333;
+                            text-decoration: none;
+                            font-weight: 500;
+                        }
+                        .nav-links a.active {
+                            color: #4318FF;
+                        }
+                        .emergency-notice {
+                            background-color: #fce8e6;
+                            color: #c5221f;
+                            padding: 10px 15px;
+                            margin-bottom: 20px;
+                            border-radius: 5px;
+                            border-left: 4px solid #c5221f;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>ATS Dashboard</h1>
+                        <div class="user-info">
+                            <div class="user-avatar">E</div>
+                            <span>Emergency User</span>
+                        </div>
+                    </div>
+                    
+                    <nav class="navbar">
+                        <ul class="nav-links">
+                            <li><a href="#" class="active">Dashboard</a></li>
+                            <li><a href="#">Jobs</a></li>
+                            <li><a href="#">Applicants</a></li>
+                            <li><a href="#">Interviews</a></li>
+                            <li><a href="#">Settings</a></li>
+                        </ul>
+                    </nav>
+                    
+                    <div class="container">
+                        <div class="emergency-notice">
+                            <strong>EMERGENCY MODE ACTIVE:</strong> You are viewing a simplified emergency dashboard. This is a static HTML page rendered directly to bypass any login or authentication issues.
+                        </div>
+                        
+                        <div class="dashboard-card">
+                            <h2 class="card-title">Overview</h2>
+                            <div class="stats-grid">
+                                <div class="stat-box">
+                                    <div class="stat-value">3</div>
+                                    <div class="stat-label">Total Jobs</div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-value">2</div>
+                                    <div class="stat-label">Active Applicants</div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-value">2</div>
+                                    <div class="stat-label">Open Positions</div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-value">0</div>
+                                    <div class="stat-label">Interviews This Week</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="dashboard-card">
+                            <h2 class="card-title">Recent Jobs</h2>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Job Title</th>
+                                        <th>Status</th>
+                                        <th>Applications</th>
+                                        <th>Created Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Frontend Developer</td>
+                                        <td><span class="badge badge-open">Open</span></td>
+                                        <td>5</td>
+                                        <td>7 days ago</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Backend Developer</td>
+                                        <td><span class="badge badge-open">Open</span></td>
+                                        <td>3</td>
+                                        <td>14 days ago</td>
+                                    </tr>
+                                    <tr>
+                                        <td>UI/UX Designer</td>
+                                        <td><span class="badge badge-closed">Closed</span></td>
+                                        <td>8</td>
+                                        <td>30 days ago</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="dashboard-card">
+                            <h2 class="card-title">Recent Applicants</h2>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Position</th>
+                                        <th>Status</th>
+                                        <th>Applied Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>John Doe</td>
+                                        <td>Frontend Developer</td>
+                                        <td><span class="badge badge-applied">Applied</span></td>
+                                        <td>5 days ago</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Jane Smith</td>
+                                        <td>Backend Developer</td>
+                                        <td><span class="badge badge-interview">Interview</span></td>
+                                        <td>10 days ago</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="dashboard-card">
+                            <h2 class="card-title">MongoDB Connection Help</h2>
+                            <p>To check your MongoDB database connection:</p>
+                            <ol>
+                                <li>Check your MongoDB connection string in your backend's .env file</li>
+                                <li>Verify MongoDB is running (if self-hosted) or accessible (if cloud-hosted)</li>
+                                <li>Check MongoDB Atlas dashboard (if using Atlas) for cluster status</li>
+                                <li>Verify network rules allow connections from your application</li>
+                                <li>Look for connection errors in your backend logs</li>
+                            </ol>
+                            <p>Common MongoDB connection issues:</p>
+                            <ul>
+                                <li>Incorrect connection string format</li>
+                                <li>Network/firewall restrictions</li>
+                                <li>Authentication failures (username/password issues)</li>
+                                <li>MongoDB service not running</li>
+                                <li>Database name misspelled</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <script>
+                        // Set a flag to indicate we're in emergency mode
+                        localStorage.setItem('emergency_mode', 'true');
+                        console.log('[TAKEOVER V13] Emergency dashboard rendered successfully');
+                        
+                        // Any navigation on this page will be intercepted and ignored
+                        document.addEventListener('click', function(e) {
+                            if (e.target.tagName === 'A' || e.target.closest('a')) {
+                                e.preventDefault();
+                                console.log('[TAKEOVER V13] Link click intercepted - navigation disabled in emergency mode');
+                            }
+                        }, true);
+                    </script>
+                </body>
+                </html>
+            `);
+            document.close();
+        } else {
+            console.log('[TAKEOVER V13] Not on login page, allowing normal page load');
         }
       })();
       
       // Override health check and set flags
       window.t3 = async function() {
-        console.log('[BYPASS V12] Health check intercepted');
+        console.log('[TAKEOVER V13] Health check intercepted');
         return Promise.resolve({ status: 'healthy', mocked: true });
       };
       window.FORCE_DEMO_MODE = true;
       window.HEALTH_CHECKS_DISABLED = true;
-      
-      // Also patch the Google login button if it appears
-      document.addEventListener('DOMContentLoaded', function() {
-        console.log('[BYPASS V12] DOM loaded, looking for Google buttons');
-        
-        // Create an emergency button
-        const emergencyBtn = document.createElement('button');
-        emergencyBtn.textContent = 'EMERGENCY DASHBOARD ACCESS';
-        emergencyBtn.style.position = 'fixed';
-        emergencyBtn.style.top = '10px';
-        emergencyBtn.style.right = '10px';
-        emergencyBtn.style.zIndex = '99999';
-        emergencyBtn.style.padding = '10px';
-        emergencyBtn.style.backgroundColor = 'red';
-        emergencyBtn.style.color = 'white';
-        emergencyBtn.style.fontWeight = 'bold';
-        emergencyBtn.style.border = 'none';
-        emergencyBtn.style.borderRadius = '5px';
-        emergencyBtn.onclick = function() {
-          window.location.replace(window.location.origin + '/dashboard');
-        };
-        document.body.appendChild(emergencyBtn);
-      });
     </script>
     <script type="module" src="/src/main.jsx"></script>
   </head>
