@@ -31,6 +31,22 @@
       localStorage.setItem('auth_user', JSON.stringify(mockUser));
       localStorage.setItem('hr_dashboard_user', JSON.stringify(mockUser));
       
+      // Create demo data for dashboard
+      const demoJobs = [
+        { _id: 'demo_job_1', title: 'Frontend Developer', status: 'open', applications: 5, createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString() },
+        { _id: 'demo_job_2', title: 'Backend Developer', status: 'open', applications: 3, createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString() },
+        { _id: 'demo_job_3', title: 'UI/UX Designer', status: 'closed', applications: 8, createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString() }
+      ];
+      
+      const demoApplicants = [
+        { _id: 'demo_applicant_1', name: 'John Doe', jobId: 'demo_job_1', status: 'applied', createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString() },
+        { _id: 'demo_applicant_2', name: 'Jane Smith', jobId: 'demo_job_2', status: 'interview', createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString() }
+      ];
+      
+      localStorage.setItem('demoJobs', JSON.stringify(demoJobs));
+      localStorage.setItem('demoApplicants', JSON.stringify(demoApplicants));
+      localStorage.setItem('demoDataInitialized', 'true');
+      
       // Health check interceptor
       window.t3 = async function() {
         console.log('Health check intercepted');
@@ -38,6 +54,74 @@
       };
       window.FORCE_DEMO_MODE = true;
       window.HEALTH_CHECKS_DISABLED = true;
+      
+      // Login handler and auto-redirect
+      document.addEventListener('DOMContentLoaded', function() {
+        console.log('Demo authentication script activated - checking page');
+        
+        const isLoginPage = window.location.pathname === '/login' || window.location.pathname === '/';
+        
+        if (isLoginPage) {
+          console.log('On login page - redirecting to dashboard');
+          
+          // Execute after a slight delay to ensure app is initialized
+          setTimeout(function() {
+            // Try various navigation methods
+            if (window.location.pathname !== '/dashboard') {
+              console.log('Navigating to dashboard...');
+              
+              // Method 1: Direct URL change
+              window.location.href = '/dashboard';
+              
+              // Method 2: History API (for SPA routing)
+              setTimeout(function() {
+                if (window.location.pathname !== '/dashboard') {
+                  try {
+                    window.history.pushState({}, '', '/dashboard');
+                    window.dispatchEvent(new Event('popstate'));
+                    console.log('Used History API to navigate');
+                  } catch (e) {
+                    console.log('History API navigation failed:', e);
+                  }
+                }
+              }, 500);
+            }
+          }, 100);
+        } else {
+          console.log('Not on login page - no redirect needed');
+        }
+      });
+      
+      // Intercept XMLHttpRequest for any auth API calls
+      const originalXHROpen = XMLHttpRequest.prototype.open;
+      XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
+        if (typeof url === 'string' && (url.includes('/api/auth') || url.includes('/login'))) {
+          console.log('Intercepting auth API call:', url);
+          const self = this;
+          
+          // Simulate successful login response
+          setTimeout(function() {
+            const mockResponse = {
+              success: true,
+              user: mockUser,
+              token: mockUser.token,
+              message: 'Login successful (mock)'
+            };
+            
+            Object.defineProperty(self, 'status', { value: 200 });
+            Object.defineProperty(self, 'readyState', { value: 4 });
+            Object.defineProperty(self, 'responseText', { value: JSON.stringify(mockResponse) });
+            
+            if (self.onreadystatechange) self.onreadystatechange();
+            if (self.onload) self.onload();
+          }, 500);
+          
+          // Don't actually make the request
+          return originalXHROpen.call(this, method, 'data:text/plain,', async, user, password);
+        }
+        
+        return originalXHROpen.apply(this, arguments);
+      };
     </script>
     <script type="module" src="/src/main.jsx"></script>
   </head>
