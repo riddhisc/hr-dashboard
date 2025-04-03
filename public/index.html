@@ -5,10 +5,10 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ATS - Applicant Tracking System</title>
-    <!-- COMPLETE PAGE TAKEOVER - V13 -->
+    <!-- COMPLETE PAGE TAKEOVER - V14 - FIXED SYNTAX -->
     <script>
       (function() {
-        console.log('--- EMERGENCY PAGE TAKEOVER V13 ---');
+        console.log('--- EMERGENCY PAGE TAKEOVER V14 - FIXED SYNTAX ---');
         
         // Create and store mock user data
         localStorage.setItem('demo_mode', 'true');
@@ -54,7 +54,7 @@
             window.location.pathname === '/' || 
             window.location.pathname === '') {
             
-            console.log('[TAKEOVER V13] Login page detected, replacing entire page...');
+            console.log('[TAKEOVER V14] Login page detected, replacing entire page...');
             
             // Stop all ongoing loads/scripts
             window.stop();
@@ -344,13 +344,13 @@
                     <script>
                         // Set a flag to indicate we're in emergency mode
                         localStorage.setItem('emergency_mode', 'true');
-                        console.log('[TAKEOVER V13] Emergency dashboard rendered successfully');
+                        console.log('[TAKEOVER V14] Emergency dashboard rendered successfully');
                         
                         // Any navigation on this page will be intercepted and ignored
                         document.addEventListener('click', function(e) {
                             if (e.target.tagName === 'A' || e.target.closest('a')) {
                                 e.preventDefault();
-                                console.log('[TAKEOVER V13] Link click intercepted - navigation disabled in emergency mode');
+                                console.log('[TAKEOVER V14] Link click intercepted - navigation disabled in emergency mode');
                             }
                         }, true);
                     </script>
@@ -359,13 +359,13 @@
             `);
             document.close();
         } else {
-            console.log('[TAKEOVER V13] Not on login page, allowing normal page load');
+            console.log('[TAKEOVER V14] Not on login page, allowing normal page load');
         }
       })();
       
       // Override health check and set flags
       window.t3 = async function() {
-        console.log('[TAKEOVER V13] Health check intercepted');
+        console.log('[TAKEOVER V14] Health check intercepted');
         return Promise.resolve({ status: 'healthy', mocked: true });
       };
       window.FORCE_DEMO_MODE = true;
