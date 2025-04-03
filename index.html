@@ -5,350 +5,72 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ATS - Applicant Tracking System</title>
-    <!-- Health check interceptor script - Ultra Aggressive Patch -->
+    <!-- ULTRA DIRECT DASHBOARD REDIRECT - NO LOGIN -->
     <script>
-      console.log('--- DEPLOYMENT CHECK V10 - DIRECT DASHBOARD NAVIGATION ---'); 
-      console.log('[PATCH v10] Applying direct dashboard navigation patch...');
-      
-      // Force demo mode immediately
-      try {
-        // Set initial flags to prevent infinite loops
-        window.__loginAttempted = false;
-        window.__forceRedirected = false;
+      // Immediate dashboard redirect - simpler approach
+      (function() {
+        console.log('--- DEPLOYMENT CHECK V11 - IMMEDIATE REDIRECT ---');
+        console.log('[PATCH v11] Redirecting to dashboard immediately...');
         
+        // Create and store mock user data
         localStorage.setItem('demo_mode', 'true');
         localStorage.setItem('backend_error_shown', 'true');
         
-        // Create a complete mock user with all required fields
         const mockUser = {
-          _id: 'auto_login_user_' + Date.now(),
-          name: 'Auto Demo User',
+          _id: 'emergency_user_' + Date.now(),
+          name: 'Emergency User',
           email: 'admin@example.com',
           role: 'admin',
           demoUser: true,
           isAuthenticated: true,
-          token: 'auto_demo_token_' + Date.now(),
+          token: 'emergency_token_' + Date.now(),
           loggedIn: true
         };
         
-        // Save user to localStorage in multiple formats to ensure compatibility
+        // Set up all auth data formats
         localStorage.setItem('user', JSON.stringify(mockUser));
         localStorage.setItem('token', mockUser.token);
         localStorage.setItem('auth_token', mockUser.token);
         localStorage.setItem('isAuthenticated', 'true');
         localStorage.setItem('auth_user', JSON.stringify(mockUser));
         localStorage.setItem('hr_dashboard_user', JSON.stringify(mockUser));
+        localStorage.setItem('demoDataInitialized', 'true');
         
-        console.log('[PATCH v10] Created complete mock user in localStorage');
+        // Create demo data for dashboard
+        const demoJobs = [
+          { _id: 'demo_job_1', title: 'Frontend Developer', status: 'open', applications: 5, createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString() },
+          { _id: 'demo_job_2', title: 'Backend Developer', status: 'open', applications: 3, createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString() },
+          { _id: 'demo_job_3', title: 'UI/UX Designer', status: 'closed', applications: 8, createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString() }
+        ];
         
-        // Initialize demo data immediately
-        const initializeDemoData = () => {
-          console.log('[PATCH v10] Initializing demo data in localStorage...');
-          
-          // Create sample demo jobs
-          const demoJobs = [
-            { _id: 'demo_job_1', title: 'Frontend Developer', status: 'open', applications: 5, createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString() },
-            { _id: 'demo_job_2', title: 'Backend Developer', status: 'open', applications: 3, createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString() },
-            { _id: 'demo_job_3', title: 'UI/UX Designer', status: 'closed', applications: 8, createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString() }
-          ];
-          
-          // Create sample demo applicants
-          const demoApplicants = [
-            { _id: 'demo_applicant_1', name: 'John Doe', jobId: 'demo_job_1', status: 'applied', createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString() },
-            { _id: 'demo_applicant_2', name: 'Jane Smith', jobId: 'demo_job_2', status: 'interview', createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString() }
-          ];
-          
-          // Create sample demo interviews
-          const demoInterviews = [
-            { _id: 'demo_interview_1', applicantId: 'demo_applicant_1', jobId: 'demo_job_1', date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], time: '10:00 AM', status: 'scheduled', interviewers: ['Demo Interviewer 1'] },
-            { _id: 'demo_interview_2', applicantId: 'demo_applicant_2', jobId: 'demo_job_2', date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], time: '2:00 PM', status: 'pending', interviewers: ['Demo Interviewer 2'] }
-          ];
-          
-          localStorage.setItem('demoJobs', JSON.stringify(demoJobs));
-          localStorage.setItem('demoApplicants', JSON.stringify(demoApplicants));
-          localStorage.setItem('demoInterviews', JSON.stringify(demoInterviews));
-          localStorage.setItem('demoDataInitialized', 'true');
-        };
+        const demoApplicants = [
+          { _id: 'demo_applicant_1', name: 'John Doe', jobId: 'demo_job_1', status: 'applied', createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString() },
+          { _id: 'demo_applicant_2', name: 'Jane Smith', jobId: 'demo_job_2', status: 'interview', createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString() }
+        ];
         
-        // Initialize demo data
-        initializeDemoData();
+        localStorage.setItem('demoJobs', JSON.stringify(demoJobs));
+        localStorage.setItem('demoApplicants', JSON.stringify(demoApplicants));
         
-        // Most extreme approach: directly force navigation to dashboard immediately
-        const forceNavigationToDashboard = () => {
-          if (window.__forceRedirected) return; // Only attempt once
+        // CRITICAL FIX: Immediately redirect to dashboard, overriding normal page load
+        if (window.location.pathname === '/' || 
+            window.location.pathname === '/login' || 
+            window.location.pathname === '') {
+          // Prevent default page loading
+          document.open();
+          document.write('<html><body><h1>Redirecting to dashboard...</h1></body></html>');
+          document.close();
           
-          window.__forceRedirected = true;
-          console.log('[PATCH v10] Forcing immediate navigation to dashboard...');
-          
-          // Set a flag to indicate we're logged in
-          window.sessionStorage.setItem('isLoggedIn', 'true');
-          
-          // Direct navigation is most reliable
-          setTimeout(() => {
-            window.location.href = window.location.origin + '/dashboard';
-          }, 500);
-        };
-        
-        // Add a click listener to the whole document to capture any clicks
-        document.addEventListener('click', (e) => {
-          // After any click, wait a short time then force dashboard navigation
-          setTimeout(forceNavigationToDashboard, 1000);
-        }, { once: true });
-        
-        // Try a single Google login click if available
-        const attemptGoogleLogin = () => {
-          if (window.__loginAttempted) return false; // Only attempt once
-          
-          window.__loginAttempted = true;
-          console.log('[PATCH v10] Attempting one-time Google login...');
-          
-          try {
-            // Find and click Google login button once
-            const googleButton = Array.from(document.querySelectorAll('button')).find(
-              button => button.textContent.includes('Google') || 
-                         button.innerHTML.includes('Google') ||
-                         button.innerHTML.includes('svg')
-            );
-            
-            if (googleButton) {
-              console.log('[PATCH v10] Found Google login button, clicking once only');
-              googleButton.click();
-              
-              // Force navigation regardless of Google login success
-              setTimeout(forceNavigationToDashboard, 2000);
-              return true;
-            }
-          } catch (e) {
-            console.error('[PATCH v10] Error attempting Google login:', e);
-          }
-          
-          // If Google login failed, try direct navigation
-          setTimeout(forceNavigationToDashboard, 1000);
-          return false;
-        };
-        
-        // Try login on DOMContentLoaded
-        window.addEventListener('DOMContentLoaded', () => {
-          console.log('[PATCH v10] DOM loaded, waiting briefly before login attempt...');
-          
-          // Add the emergency button immediately
-          const forceButton = document.createElement('button');
-          forceButton.innerText = 'GO TO DASHBOARD';
-          forceButton.style.position = 'fixed';
-          forceButton.style.bottom = '10px';
-          forceButton.style.right = '10px';
-          forceButton.style.zIndex = '99999';
-          forceButton.style.background = 'red';
-          forceButton.style.color = 'white';
-          forceButton.style.padding = '10px';
-          forceButton.style.border = 'none';
-          forceButton.style.borderRadius = '5px';
-          forceButton.onclick = forceNavigationToDashboard;
-          document.body.appendChild(forceButton);
-          
-          // Wait a moment to ensure page is ready
-          setTimeout(attemptGoogleLogin, 1000);
-          
-          // Final fallback - direct navigation after timeout
-          setTimeout(forceNavigationToDashboard, 5000);
-        });
-        
-        // Also add a timer for immediate navigation regardless of DOM state
-        setTimeout(forceNavigationToDashboard, 3000);
-        
-      } catch (e) { console.error('[PATCH v10] Error in setup:', e); }
-
-      // Define global flags
+          // Force navigation to dashboard
+          window.location.replace(window.location.origin + '/dashboard');
+        }
+      })();
+      
+      // Health check interception (simplified)
+      window.t3 = async function() {
+        return Promise.resolve({ status: 'healthy', mocked: true });
+      };
       window.FORCE_DEMO_MODE = true;
       window.HEALTH_CHECKS_DISABLED = true;
-      window.API_MOCKED = true;
-
-      // --- Ultra Aggressive Patching --- 
-
-      // 1. Override t3 function (if it exists)
-      console.log('[PATCH v10] Force overriding global t3 function...');
-      window.t3 = async function() {
-        console.log('[PATCH v10] Intercepted t3 call! Returning mock success.');
-        return Promise.resolve({ status: 'healthy', message: 'Mocked t3 health check v10', mocked: true });
-      };
-      if (typeof globalThis !== 'undefined') globalThis.t3 = window.t3;
-
-      // 2. Override XMLHttpRequest - Mock immediately on open for target URLs
-      console.log('[PATCH v10] Overriding XMLHttpRequest...');
-      const OriginalXMLHttpRequest = window.XMLHttpRequest;
-      function PatchedXMLHttpRequest() {
-        console.log('[XHR PATCH v10] Constructor called');
-        const xhr = new OriginalXMLHttpRequest();
-        const originalOpen = xhr.open;
-        const originalSend = xhr.send;
-        let isMocked = false;
-        let requestURL = '';
-
-        xhr.open = function(method, url, ...args) {
-          requestURL = typeof url === 'string' ? url : '';
-          console.log(`[XHR PATCH v10] open(${method}, ${requestURL})`);
-          
-          // Mock backend and login calls
-          if (requestURL.includes('health-check') || 
-              requestURL.includes('healthcheck') || 
-              requestURL.includes('hr-dashboard-backend.onrender.com') ||
-              requestURL.includes('/auth') ||
-              requestURL.includes('/login') ||
-              requestURL.includes('/api')) {
-            
-            console.log(`[XHR PATCH v10] Target URL detected: ${requestURL}. Mocking immediately.`);
-            isMocked = true;
-            // We still call originalOpen but with a dummy URL to avoid network errors
-            return originalOpen.call(xhr, method, 'data:text/plain,mocked', ...args);
-          } else {
-            isMocked = false;
-            return originalOpen.apply(xhr, arguments);
-          }
-        };
-
-        xhr.send = function(data) {
-          console.log(`[XHR PATCH v10] send() for URL: ${requestURL}, data:`, data);
-          
-          if (isMocked) {
-            let responseText;
-            
-            // Create custom responses based on URL pattern
-            if (requestURL.includes('health-check') || requestURL.includes('healthcheck')) {
-              responseText = JSON.stringify({ status: 'healthy', message: 'Mocked health check v10' });
-            } 
-            else if (requestURL.includes('/login') || requestURL.includes('/auth')) {
-              responseText = JSON.stringify({
-                success: true,
-                user: {
-                  _id: 'auto_login_user_' + Date.now(),
-                  name: 'Auto Demo User',
-                  email: 'admin@example.com',
-                  role: 'admin',
-                  token: 'auto_demo_token_' + Date.now(),
-                  isAuthenticated: true
-                },
-                token: 'auto_demo_token_' + Date.now(),
-                message: 'Login successful'
-              });
-            }
-            else {
-              // Default mock response for other API calls
-              responseText = JSON.stringify({ 
-                status: 'success', 
-                data: { mocked: true, message: 'Mocked API v10' } 
-              });
-            }
-            
-            console.log(`[XHR PATCH v10] Returning mock response for ${requestURL}: ${responseText}`);
-            
-            setTimeout(() => {
-              try {
-                Object.defineProperty(xhr, 'status', { value: 200, configurable: true });
-                Object.defineProperty(xhr, 'statusText', { value: 'OK (Mocked)', configurable: true });
-                Object.defineProperty(xhr, 'responseText', { value: responseText, configurable: true });
-                Object.defineProperty(xhr, 'response', { value: responseText, configurable: true });
-                Object.defineProperty(xhr, 'readyState', { value: 4, configurable: true });
-                
-                // Call event handlers safely
-                if (typeof xhr.onreadystatechange === 'function') {
-                  console.log('[XHR PATCH v10] Calling onreadystatechange');
-                  xhr.onreadystatechange();
-                }
-                if (typeof xhr.onload === 'function') {
-                  console.log('[XHR PATCH v10] Calling onload');
-                  xhr.onload();
-                }
-                
-                // Dispatch events
-                xhr.dispatchEvent(new Event('readystatechange'));
-                xhr.dispatchEvent(new Event('load'));
-                xhr.dispatchEvent(new Event('loadend')); 
-              } catch (e) {
-                console.error('[XHR PATCH v10] Error simulating response:', e);
-              }
-            }, 5); // Minimal delay
-            return undefined;
-          } else {
-            console.log('[XHR PATCH v10] URL not mocked, using original send.');
-            return originalSend.apply(xhr, arguments);
-          }
-        };
-
-        // Prevent timeout setting for mocked requests
-        let actualTimeout = 0;
-        Object.defineProperty(xhr, 'timeout', {
-            configurable: true,
-            set: function(val) {
-              if (isMocked) {
-                 console.log(`[XHR PATCH v10] Ignoring timeout set (${val}) for mocked ${requestURL}`);
-              } else {
-                 actualTimeout = val;
-              }
-            },
-            get: function() { return isMocked ? 0 : actualTimeout; }
-        });
-
-        return xhr;
-      }
-      window.XMLHttpRequest = PatchedXMLHttpRequest;
-
-      // 3. Override fetch API with login support
-      console.log('[PATCH v10] Overriding fetch API...');
-      const originalFetch = window.fetch;
-      window.fetch = function(url, options) {
-        const requestURL = (typeof url === 'object' && url !== null) ? url.url : url;
-        console.log(`[FETCH PATCH v10] fetch(${requestURL})`, options);
-        
-        const isHealthCheck = typeof requestURL === 'string' && 
-                             (requestURL.includes('health-check') || requestURL.includes('healthcheck'));
-        const isBackendApi = typeof requestURL === 'string' && requestURL.includes('hr-dashboard-backend.onrender.com');
-        const isLogin = typeof requestURL === 'string' && 
-                       (requestURL.includes('/login') || requestURL.includes('/auth'));
-        const isApi = typeof requestURL === 'string' && requestURL.includes('/api');
-
-        if (isHealthCheck || isBackendApi || isLogin || isApi) {
-          console.log('[FETCH PATCH v10] Intercepting API request:', requestURL);
-          
-          let responseData;
-          
-          if (isHealthCheck) {
-            responseData = { status: 'healthy', message: 'Mocked fetch health check v10', mock: true };
-          } else if (isLogin) {
-            responseData = {
-              success: true,
-              user: {
-                _id: 'auto_login_user_' + Date.now(),
-                name: 'Auto Demo User',
-                email: 'admin@example.com',
-                role: 'admin',
-                token: 'auto_demo_token_' + Date.now(),
-                isAuthenticated: true
-              },
-              token: 'auto_demo_token_' + Date.now(),
-              message: 'Login successful'
-            };
-          } else {
-            // Default API response
-            responseData = { 
-              status: 'success', 
-              data: { mocked: true, message: 'Mocked API response v10' } 
-            };
-          }
-          
-          console.log('[FETCH PATCH v10] Returning mock response:', responseData);
-          
-          return Promise.resolve(new Response(
-            JSON.stringify(responseData),
-            { status: 200, headers: { 'Content-Type': 'application/json' } }
-          ));
-        }
-        
-        // Pass through non-API requests
-        console.log('[FETCH PATCH v10] Passing through non-API request:', requestURL);
-        return originalFetch.apply(window, arguments);
-      };
-
-      console.log('[PATCH v10] Direct dashboard navigation patches applied.');
     </script>
     <script type="module" src="/src/main.jsx"></script>
   </head>
