@@ -369,7 +369,7 @@ api.interceptors.response.use(
       // Return a successful response with mock data
       // This will prevent API errors from affecting the demo experience
       return Promise.resolve({
-        data: { 
+                data: {
           message: 'This is mock data for demo mode', 
           success: true,
           mockData: true,

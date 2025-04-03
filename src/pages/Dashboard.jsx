@@ -93,7 +93,7 @@ function Dashboard() {
         console.log('Using local storage data by default');
         
         // Load from localStorage for all users
-        loadFromLocalStorage();
+          loadFromLocalStorage();
         
         // Make sure the cache is cleared to force recalculation
         if (isMounted) {
@@ -132,7 +132,7 @@ function Dashboard() {
       console.log('Using local data for refresh');
       
       // Load data from localStorage
-      loadFromLocalStorage();
+        loadFromLocalStorage();
       
       // Force state update to trigger re-render
       setRefreshKey(prevKey => prevKey + 1);
@@ -149,8 +149,8 @@ function Dashboard() {
         position: 'bottom-right'
       });
     }
-  }
-  
+      }
+      
   // Helper to load data from localStorage
   const loadFromLocalStorage = () => {
       // Load Google user applicants from localStorage

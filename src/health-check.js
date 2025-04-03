@@ -18,10 +18,10 @@ console.log('Health Check: Running in demo mode: true (forced)');
  */
 export const checkApiHealth = async () => {
   console.log('Health check: Demo mode active - all API health checks are disabled');
-  return { 
-    status: 'healthy', 
-    message: 'Application is running in demo mode with local data only (no backend required)'
-  };
+    return { 
+      status: 'healthy', 
+      message: 'Application is running in demo mode with local data only (no backend required)'
+    };
 };
 
 /**
@@ -33,7 +33,7 @@ export const checkLocalStorageHealth = () => {
     // Try to write to localStorage
     localStorage.setItem('health_check_test', 'ok');
     localStorage.removeItem('health_check_test');
-    return { status: 'healthy', message: 'localStorage is working correctly' };
+      return { status: 'healthy', message: 'localStorage is working correctly' };
   } catch (error) {
     console.error('localStorage health check failed:', error);
     return { status: 'degraded', message: 'localStorage not available - some features may not work' };
@@ -46,9 +46,9 @@ export const checkLocalStorageHealth = () => {
  */
 export const runAllHealthChecks = async () => {
   const apiHealth = { 
-    status: 'healthy', 
-    message: 'Application is running in demo mode with local data only (no backend required)'
-  };
+      status: 'healthy', 
+      message: 'Application is running in demo mode with local data only (no backend required)'
+    };
   
   const localStorageHealth = checkLocalStorageHealth();
   
