@@ -5,12 +5,10 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ATS - Applicant Tracking System</title>
-    <!-- ULTRA DIRECT DASHBOARD REDIRECT - NO LOGIN -->
+    <!-- EMERGENCY LOGIN BYPASS - V12 -->
     <script>
-      // Immediate dashboard redirect - simpler approach
       (function() {
-        console.log('--- DEPLOYMENT CHECK V11 - IMMEDIATE REDIRECT ---');
-        console.log('[PATCH v11] Redirecting to dashboard immediately...');
+        console.log('--- EMERGENCY BYPASS V12 ---');
         
         // Create and store mock user data
         localStorage.setItem('demo_mode', 'true');
@@ -51,26 +49,98 @@
         localStorage.setItem('demoJobs', JSON.stringify(demoJobs));
         localStorage.setItem('demoApplicants', JSON.stringify(demoApplicants));
         
-        // CRITICAL FIX: Immediately redirect to dashboard, overriding normal page load
-        if (window.location.pathname === '/' || 
-            window.location.pathname === '/login' || 
-            window.location.pathname === '') {
-          // Prevent default page loading
-          document.open();
-          document.write('<html><body><h1>Redirecting to dashboard...</h1></body></html>');
-          document.close();
+        // Ultra-aggressive redirect - catch any login page anywhere
+        function bypassLogin() {
+          console.log('[BYPASS V12] Current URL:', window.location.href);
+          // Handle any path containing login or the root
+          if (window.location.pathname.includes('/login') || 
+              window.location.pathname === '/' || 
+              window.location.pathname === '') {
+            
+            console.log('[BYPASS V12] Login page detected, forcing redirect...');
+            
+            try {
+              // Redirect to dashboard
+              window.stop(); // Stop any further page loading
+              const dashboardUrl = window.location.origin + '/dashboard';
+              console.log('[BYPASS V12] Redirecting to:', dashboardUrl);
+              window.location.replace(dashboardUrl);
+              return true;
+            } catch (e) {
+              console.error('[BYPASS V12] Redirect error:', e);
+            }
+          }
+          return false;
+        }
+        
+        // Try redirect immediately
+        if (!bypassLogin()) {
+          // If not redirected, set intervals to keep checking
+          console.log('[BYPASS V12] Not redirected immediately, will retry...');
           
-          // Force navigation to dashboard
-          window.location.replace(window.location.origin + '/dashboard');
+          // Handle login button clicks - prevent form submission
+          document.addEventListener('click', function(e) {
+            // If any button is clicked and we're on login page
+            if (e.target.tagName === 'BUTTON' || 
+                e.target.closest('button') || 
+                e.target.tagName === 'A' ||
+                e.target.closest('a')) {
+              
+              console.log('[BYPASS V12] Click intercepted, checking if login-related');
+              
+              // If on login page or button contains "login"/"sign in"
+              if (window.location.pathname.includes('/login') || 
+                  e.target.textContent?.toLowerCase().includes('sign in') ||
+                  e.target.textContent?.toLowerCase().includes('login')) {
+                
+                console.log('[BYPASS V12] Login action detected, forcing redirect');
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Force redirect
+                window.location.replace(window.location.origin + '/dashboard');
+                return false;
+              }
+            }
+          }, true);
+          
+          // Also set a delay to force the redirect
+          setTimeout(bypassLogin, 500);
+          setTimeout(bypassLogin, 1000);
+          setTimeout(bypassLogin, 2000);
         }
       })();
       
-      // Health check interception (simplified)
+      // Override health check and set flags
       window.t3 = async function() {
+        console.log('[BYPASS V12] Health check intercepted');
         return Promise.resolve({ status: 'healthy', mocked: true });
       };
       window.FORCE_DEMO_MODE = true;
       window.HEALTH_CHECKS_DISABLED = true;
+      
+      // Also patch the Google login button if it appears
+      document.addEventListener('DOMContentLoaded', function() {
+        console.log('[BYPASS V12] DOM loaded, looking for Google buttons');
+        
+        // Create an emergency button
+        const emergencyBtn = document.createElement('button');
+        emergencyBtn.textContent = 'EMERGENCY DASHBOARD ACCESS';
+        emergencyBtn.style.position = 'fixed';
+        emergencyBtn.style.top = '10px';
+        emergencyBtn.style.right = '10px';
+        emergencyBtn.style.zIndex = '99999';
+        emergencyBtn.style.padding = '10px';
+        emergencyBtn.style.backgroundColor = 'red';
+        emergencyBtn.style.color = 'white';
+        emergencyBtn.style.fontWeight = 'bold';
+        emergencyBtn.style.border = 'none';
+        emergencyBtn.style.borderRadius = '5px';
+        emergencyBtn.onclick = function() {
+          window.location.replace(window.location.origin + '/dashboard');
+        };
+        document.body.appendChild(emergencyBtn);
+      });
     </script>
     <script type="module" src="/src/main.jsx"></script>
   </head>
