@@ -7,7 +7,7 @@
     <title>ATS - Applicant Tracking System</title>
     <!-- Health check interceptor script - Ultra Aggressive Patch -->
     <script>
-      console.log('--- DEPLOYMENT CHECK V5 ACTIVE ---'); // New verification log
+      console.log('--- DEPLOYMENT CHECK V6 ACTIVE - MAJOR VISIBLE CHANGE ---'); // Updated verification log
       console.log('[PATCH v4] Applying ultra-aggressive immediate patches...');
       
       // Force demo mode immediately
@@ -192,7 +192,11 @@
       console.log('[PATCH v4] Ultra-aggressive patches applied.');
     </script>
   </head>
-  <body style="background-color: lightblue;">
+  <body style="background-color: red;"> <!-- Changed to RED for unmistakable visibility -->
+    <!-- MAJOR VISIBLE CHANGE -->
+    <div style="background-color: yellow; padding: 20px; text-align: center; font-size: 24px; font-weight: bold; color: red; border: 5px solid black;">
+      VERIFICATION BANNER V6 - THIS MUST BE VISIBLE IF DEPLOYMENT WORKS
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
