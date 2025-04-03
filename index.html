@@ -59,7 +59,7 @@
       document.addEventListener('DOMContentLoaded', function() {
         console.log('Demo authentication script activated - checking page');
         
-        const isLoginPage = window.location.pathname === '/login' || window.location.pathname === '/';
+        const isLoginPage = window.location.pathname.includes('login');
         
         if (isLoginPage) {
           console.log('On login page - redirecting to dashboard');
@@ -67,7 +67,7 @@
           // Execute after a slight delay to ensure app is initialized
           setTimeout(function() {
             // Try various navigation methods
-            if (window.location.pathname !== '/dashboard') {
+            if (!window.location.pathname.includes('dashboard')) {
               console.log('Navigating to dashboard...');
               
               // Method 1: Direct URL change
@@ -75,7 +75,7 @@
               
               // Method 2: History API (for SPA routing)
               setTimeout(function() {
-                if (window.location.pathname !== '/dashboard') {
+                if (!window.location.pathname.includes('dashboard')) {
                   try {
                     window.history.pushState({}, '', '/dashboard');
                     window.dispatchEvent(new Event('popstate'));
