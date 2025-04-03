@@ -59,7 +59,7 @@
       document.addEventListener('DOMContentLoaded', function() {
         console.log('Demo authentication script activated - checking page');
         
-        const isLoginPage = window.location.pathname.includes('login');
+        const isLoginPage = window.location.pathname.includes('login') || document.title.includes('Sign in');
         
         if (isLoginPage) {
           console.log('On login page - redirecting to dashboard');
