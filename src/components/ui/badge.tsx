@@ -1,0 +1,2 @@
+import { cn } from '@/lib/utils';
+export function Badge({children,tone='default'}:{children:React.ReactNode;tone?:'default'|'success'|'warning'|'danger'|'info'}) { const tones={default:'bg-slate-100 text-slate-600',success:'bg-emerald-50 text-emerald-700',warning:'bg-amber-50 text-amber-700',danger:'bg-rose-50 text-rose-700',info:'bg-indigo-50 text-indigo-700'}; return <span className={cn('inline-flex items-center rounded-full px-2 py-1 text-[10px] font-semibold',tones[tone])}>{children}</span>; }

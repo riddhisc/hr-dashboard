@@ -1,0 +1,2 @@
+'use client';
+export default function ErrorPage({ reset }: { reset: () => void }) { return <main className="grid min-h-[60vh] place-items-center"><div className="text-center"><h1 className="text-xl font-bold text-slate-800">Something went wrong</h1><p className="mt-2 text-sm text-slate-500">The workspace could not load this section.</p><button onClick={reset} className="mt-5 rounded-lg bg-[#6757e8] px-4 py-2 text-xs font-semibold text-white">Try again</button></div></main>; }
