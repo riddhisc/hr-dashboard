@@ -46,3 +46,12 @@ docs/             audit, architecture, decisions, performance
 ```
 
 See [docs/AUDIT.md](docs/AUDIT.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), and [docs/DECISIONS.md](docs/DECISIONS.md) for migration context.
+
+## Deploy to Vercel
+
+```bash
+pnpm dlx vercel login
+pnpm dlx vercel --prod
+```
+
+Set `AUTH_SECRET`, `NEXT_PUBLIC_APP_URL`, and `DATABASE_URL` in the Vercel project settings. The current demo works without `DATABASE_URL`; Neon persistence becomes active once that variable is configured.
