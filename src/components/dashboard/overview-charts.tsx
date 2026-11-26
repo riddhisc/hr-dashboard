@@ -1,14 +1,14 @@
 'use client';
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
-const barColors = ['#7c3aed', '#db2777', '#0284c7', '#059669', '#ea580c', '#ca8a04'];
+const barColors = ['#0a6fe0', '#6d5bd0', '#1e9be0', '#2f2fa8', '#f47c7c', '#0d9488'];
 const tick = { fill: '#98a0b3', fontSize: 10 };
 const tooltip = { border: '1px solid #e8eaf1', borderRadius: 10, fontSize: 12 };
 
 export function HiringChart({ data }: { data: { month: string; hires: number; exits: number }[] }) {
   return <div className="h-[240px] w-full"><ResponsiveContainer width="100%" height="100%"><AreaChart data={data} margin={{ top: 10, right: 8, left: -22, bottom: 0 }}>
     <CartesianGrid vertical={false} stroke="#f0f1f5" /><XAxis dataKey="month" axisLine={false} tickLine={false} tick={tick} /><YAxis allowDecimals={false} axisLine={false} tickLine={false} tick={tick} /><Tooltip contentStyle={tooltip} />
-    <Area type="monotone" dataKey="hires" name="Joined" stroke="#7c3aed" strokeWidth={3} fill="#8b5cf6" fillOpacity={0.25} /><Area type="monotone" dataKey="exits" name="Left" stroke="#f43f5e" strokeWidth={2.5} fill="#fb7185" fillOpacity={0.12} />
+    <Area type="monotone" dataKey="hires" name="Joined" stroke="#0a6fe0" strokeWidth={3} fill="#3b92ee" fillOpacity={0.25} /><Area type="monotone" dataKey="exits" name="Left" stroke="#f43f5e" strokeWidth={2.5} fill="#fb7185" fillOpacity={0.12} />
   </AreaChart></ResponsiveContainer></div>;
 }
 export function DepartmentChart({ data }: { data: { name: string; count: number }[] }) {

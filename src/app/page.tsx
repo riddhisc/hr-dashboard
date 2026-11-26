@@ -1,2 +1,2 @@
 import { redirect } from 'next/navigation';
-export default function Home(): never { redirect('/dashboard'); }
+export default function Home(): never { redirect('/login'); }

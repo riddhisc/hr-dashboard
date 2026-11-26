@@ -31,13 +31,13 @@ export default function DashboardPage() {
   const isEmpty = !ws.employees.length && !ws.jobs.length && !ws.departments.length;
 
   return <div className="mx-auto max-w-[1500px]">
-    <section className="relative mb-5 overflow-hidden rounded-3xl bg-gradient-to-r from-violet-700 via-fuchsia-600 to-pink-600 p-6 text-white shadow-xl shadow-fuchsia-300/40 sm:p-8">
+    <section className="relative mb-5 overflow-hidden rounded-3xl bg-gradient-to-r from-blue-700 via-blue-700 to-indigo-800 p-6 text-white shadow-xl shadow-indigo-300/40 sm:p-8">
       <span aria-hidden="true" className="absolute -right-10 -top-16 h-56 w-56 rounded-full bg-white/10" /><span aria-hidden="true" className="absolute -bottom-20 right-40 h-44 w-44 rounded-full bg-white/10" />
       <div className="relative flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
         <div><p className="text-xs font-semibold text-white/85">{new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
           <h1 className="mt-2 text-3xl font-bold tracking-[-.03em]">{greeting()}, {account?.name.split(' ')[0]}</h1>
           <p className="mt-2 text-sm text-white/90">Here is what is happening at {ws.settings.company}.</p></div>
-        <Link href="/employees/new" className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-5 text-xs font-bold text-violet-700 shadow-lg"><Plus size={16} /> Add employee</Link>
+        <Link href="/employees/new" className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-5 text-xs font-bold text-blue-700 shadow-lg"><Plus size={16} /> Add employee</Link>
       </div>
     </section>
     <nav aria-label="Quick actions" className="mb-5 grid gap-3 sm:grid-cols-3">{shortcuts.map(({ href, label, icon: Icon, tone }) => <Link key={href} href={href}><Card className="flex items-center gap-3 p-4 transition hover:-translate-y-0.5 hover:shadow-lg"><span className={`grid h-10 w-10 place-items-center rounded-xl ${tone}`}><Icon size={18} /></span><span className="text-sm font-semibold text-slate-700">{label}</span></Card></Link>)}</nav>

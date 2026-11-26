@@ -27,7 +27,7 @@ export default function AttendancePage() {
       <div className="grid gap-4 sm:grid-cols-3"><Stat label="Present" value={count('Present')} detail={`of ${expected.length} expected`} /><Stat label="Late" value={count('Late')} detail="check-ins" /><Stat label="Absent" value={count('Absent')} detail={`${staff.length - expected.length} on approved leave`} /></div>
       <div className="flex justify-end"><Button variant="ghost" onClick={() => downloadCsv(`attendance-${date}.csv`, [['Name', 'Department', 'Status'], ...staff.map((e) => [fullName(e), e.department, onLeave(ws, e.id, date) ? 'On leave' : marks[e.id] ?? 'Not marked'])])}><Download size={14} /> Export CSV</Button></div>
       <Table head={['Employee', 'Department', 'Status']}>{staff.map((e) => <tr key={e.id}><td className="font-semibold">{fullName(e)}</td><td>{e.department}</td><td>
-        {onLeave(ws, e.id, date) ? <Badge tone="warning">On leave</Badge> : <div className="flex gap-1">{options.map((o) => <button key={o} aria-label={`Mark ${fullName(e)} ${o}`} aria-pressed={marks[e.id] === o} onClick={() => mark(e.id, o)} className={`rounded-lg border px-3 py-1.5 text-[11px] font-semibold ${marks[e.id] === o ? 'border-[#6757e8] bg-[#6757e8] text-white' : 'border-[#e8eaf1] text-slate-500'}`}>{o}</button>)}</div>}
+        {onLeave(ws, e.id, date) ? <Badge tone="warning">On leave</Badge> : <div className="flex gap-1">{options.map((o) => <button key={o} aria-label={`Mark ${fullName(e)} ${o}`} aria-pressed={marks[e.id] === o} onClick={() => mark(e.id, o)} className={`rounded-lg border px-3 py-1.5 text-[11px] font-semibold ${marks[e.id] === o ? 'border-[#0a6fe0] bg-[#0a6fe0] text-white' : 'border-[#e8eaf1] text-slate-500'}`}>{o}</button>)}</div>}
       </td></tr>)}</Table>
     </div>}
   </Page>;
