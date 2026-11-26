@@ -1,0 +1,24 @@
+export type EmployeeStatus = 'Active' | 'Inactive';
+export type Employee = { id: string; firstName: string; lastName: string; email: string; role: string; department: string; location: string; startDate: string; endDate?: string; status: EmployeeStatus; monthlySalary: number };
+export type EmployeeDraft = Omit<Employee, 'id' | 'status' | 'endDate'>;
+export type Department = { id: string; name: string };
+export type AttendanceStatus = 'Present' | 'Late' | 'Absent';
+/** date (yyyy-mm-dd) -> employee id -> status */
+export type Attendance = Record<string, Record<string, AttendanceStatus>>;
+export type LeaveType = 'Annual' | 'Sick' | 'Personal';
+export type LeaveStatus = 'Pending' | 'Approved' | 'Declined';
+export type LeaveRequest = { id: string; employeeId: string; type: LeaveType; start: string; end: string; reason: string; status: LeaveStatus };
+export type PayrollLine = { employeeId: string; name: string; department: string; amount: number };
+export type PayrollRun = { id: string; month: string; createdAt: string; lines: PayrollLine[] };
+export type JobStatus = 'Open' | 'Closed';
+export type Job = { id: string; title: string; department: string; location: string; status: JobStatus };
+export const stages = ['Applied', 'Screening', 'Interview', 'Offer', 'Hired', 'Rejected'] as const;
+export type Stage = (typeof stages)[number];
+export type Candidate = { id: string; name: string; email: string; jobId: string; stage: Stage };
+export type InterviewStatus = 'Scheduled' | 'Completed' | 'Cancelled';
+export type Interview = { id: string; candidateId: string; interviewer: string; at: string; status: InterviewStatus };
+export type Goal = { id: string; title: string; ownerId: string; due: string; progress: number };
+export type Activity = { id: string; text: string; at: string };
+export type Settings = { company: string; currency: string; leaveAllowance: Record<LeaveType, number> };
+export type Workspace = { settings: Settings; employees: Employee[]; departments: Department[]; attendance: Attendance; leave: LeaveRequest[]; payroll: PayrollRun[]; jobs: Job[]; candidates: Candidate[]; interviews: Interview[]; goals: Goal[]; activities: Activity[] };
+export type Account = { id: string; name: string; email: string; salt: string; passwordHash: string };

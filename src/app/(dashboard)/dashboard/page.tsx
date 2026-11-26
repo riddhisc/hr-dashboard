@@ -1,20 +1,48 @@
+'use client';
 import Link from 'next/link';
-import { ArrowDownRight, ArrowUpRight, CalendarDays, ChevronRight, Clock3, Plus, UserPlus, UsersRound } from 'lucide-react';
-import { activities, departments, metrics, people } from '@/lib/data';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Plus } from 'lucide-react';
 import { DepartmentChart, HiringChart } from '@/components/dashboard/overview-charts';
+import { Card } from '@/components/ui/card';
+import { Button, buttonClass } from '@/components/ui/form';
+import { Page, Stat } from '@/components/ui/page';
+import { sampleData } from '@/lib/sample';
+import { activeEmployees, attritionRate, headcountByDepartment, hiringTrend, onLeave } from '@/lib/stats';
+import { formatDate, greeting, isoDate } from '@/lib/utils';
+import { useAccount, useAppStore, useWorkspace } from '@/stores/app';
 
-export default function DashboardPage() { return <div className="mx-auto max-w-[1500px]">
-  <div className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end"><div><p className="mb-2 text-xs font-medium text-slate-400">Workspace / Overview</p><h1 className="text-[26px] font-bold tracking-[-.03em] text-slate-900">Good morning, Priya <span className="text-xl">👋</span></h1><p className="mt-1 text-sm text-slate-500">Here’s what’s happening with your people today.</p></div><Link href="/employees?new=1" className="flex h-10 items-center justify-center gap-2 rounded-lg bg-[#6757e8] px-4 text-xs font-semibold text-white shadow-sm shadow-[#6757e8]/20"><Plus size={16}/> Add employee</Link></div>
-  <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{metrics.map((metric)=><MetricCard key={metric.label} {...metric}/>)}</div>
-  <div className="mt-5 grid gap-5 xl:grid-cols-[1.6fr_1fr]"><Card className="p-5"><div className="mb-2 flex items-start justify-between"><div><h2 className="text-sm font-bold text-slate-800">Hiring overview</h2><p className="mt-1 text-xs text-slate-400">New hires and exits over the last 12 months</p></div><select aria-label="Hiring period" className="rounded-lg border border-[#e8eaf1] bg-white px-2.5 py-2 text-[11px] text-slate-500 outline-none"><option>Last 12 months</option><option>Last 6 months</option><option>This year</option></select></div><div className="mb-2 mt-3 flex items-center gap-4 text-[10px] text-slate-400"><span className="flex items-center gap-1.5"><i className="h-2 w-2 rounded-full bg-[#6757e8]"/> New hires</span><span className="flex items-center gap-1.5"><i className="h-2 w-2 rounded-full bg-slate-300"/> Exits</span></div><HiringChart/></Card><Card className="p-5"><div className="mb-3 flex items-start justify-between"><div><h2 className="text-sm font-bold text-slate-800">Headcount by department</h2><p className="mt-1 text-xs text-slate-400">Current team distribution</p></div><Link href="/departments" className="text-xs font-semibold text-[#6757e8]">View all</Link></div><DepartmentChart/><div className="mt-1 grid grid-cols-2 gap-x-5 gap-y-2">{departments.slice(0,4).map((dept)=><div key={dept.name} className="flex items-center justify-between text-[11px]"><span className="flex items-center gap-1.5 text-slate-500"><i className={`h-2 w-2 rounded-full ${dept.color}`}/>{dept.name}</span><span className="font-semibold text-slate-700">{dept.count}</span></div>)}</div></Card></div>
-  <div className="mt-5 grid gap-5 xl:grid-cols-[1.25fr_1fr_1fr]"><Card className="p-5"><PanelTitle title="Upcoming" action="View calendar" href="/attendance"/><div className="mt-4 space-y-3.5"><Upcoming icon={<CalendarDays size={16}/>} title="Team offsite" meta="Tomorrow · All day" tone="violet"/><Upcoming icon={<UsersRound size={16}/>} title="Q4 all-hands" meta="Dec 18 · 10:00 AM" tone="blue"/><Upcoming icon={<UserPlus size={16}/>} title="3 new starters" meta="Dec 20 · Engineering" tone="amber"/></div></Card><Card className="p-5"><PanelTitle title="Recent activity" action="View all" href="/reports"/><div className="mt-4 space-y-4">{activities.slice(0,3).map((item)=><div key={item.title} className="flex gap-3"><div className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-[#f1efff] text-[#6757e8]"><Clock3 size={14}/></div><div><p className="text-xs font-medium leading-4 text-slate-700">{item.title}</p><p className="mt-1 text-[10px] text-slate-400">{item.time}</p></div></div>)}</div></Card><Card className="p-5"><PanelTitle title="People spotlight" action="Directory" href="/employees"/><div className="mt-4 space-y-3">{people.slice(0,3).map((person)=><div key={person.name} className="flex items-center gap-3"><div className={`grid h-8 w-8 place-items-center rounded-full text-[10px] font-bold ${person.tone}`}>{person.initials}</div><div className="min-w-0 flex-1"><p className="truncate text-xs font-semibold text-slate-700">{person.name}</p><p className="truncate text-[10px] text-slate-400">{person.role}</p></div><Badge tone={person.status==='On leave'?'warning':'success'}>{person.status}</Badge></div>)}</div></Card></div>
-  <Card className="mt-5 overflow-hidden"><div className="flex items-center justify-between border-b border-[#eef0f4] px-5 py-4"><div><h2 className="text-sm font-bold text-slate-800">Employee directory</h2><p className="mt-1 text-xs text-slate-400">Your most recently updated employee records</p></div><Link href="/employees" className="flex items-center gap-1 text-xs font-semibold text-[#6757e8]">View directory <ChevronRight size={14}/></Link></div><div className="overflow-x-auto"><table className="w-full min-w-[680px] text-left"><thead><tr className="border-b border-[#eef0f4] text-[10px] uppercase tracking-[.08em] text-slate-400"><th className="px-5 py-3 font-semibold">Employee</th><th className="px-5 py-3 font-semibold">Department</th><th className="px-5 py-3 font-semibold">Location</th><th className="px-5 py-3 font-semibold">Status</th><th className="px-5 py-3"/></tr></thead><tbody>{people.map((person)=><tr key={person.name} className="border-b border-[#f2f3f7] last:border-0"><td className="px-5 py-3.5"><div className="flex items-center gap-3"><div className={`grid h-8 w-8 place-items-center rounded-full text-[10px] font-bold ${person.tone}`}>{person.initials}</div><div><p className="text-xs font-semibold text-slate-700">{person.name}</p><p className="text-[10px] text-slate-400">{person.role}</p></div></div></td><td className="px-5 py-3.5 text-xs text-slate-500">{person.department}</td><td className="px-5 py-3.5 text-xs text-slate-500">{person.location}</td><td className="px-5 py-3.5"><Badge tone={person.status==='On leave'?'warning':'success'}>{person.status}</Badge></td><td className="px-5 py-3.5 text-right text-slate-300"><ChevronRight size={16}/></td></tr>)}</tbody></table></div></Card>
-  <p className="mt-6 pb-2 text-center text-[10px] text-slate-400">Peopleflow · Your people, in sync.</p>
-</div>; }
-function MetricCard({label,value,detail,trend,accent}: (typeof metrics)[number]) { const icons={violet:<UsersRound size={17}/>,blue:<UserPlus size={17}/>,amber:<ChartIcon/>,rose:<BriefcaseIcon/>}; return <Card className="p-5"><div className="flex items-start justify-between"><div><p className="text-xs font-medium text-slate-500">{label}</p><p className="mt-2 text-[26px] font-bold tracking-[-.04em] text-slate-900">{value}</p></div><div className={`grid h-9 w-9 place-items-center rounded-xl ${accent==='violet'?'bg-[#f0effe] text-[#6757e8]':accent==='blue'?'bg-[#eaf5ff] text-sky-600':accent==='amber'?'bg-[#fff7e6] text-amber-600':'bg-[#fff0f2] text-rose-500'}`}>{icons[accent]}</div></div><div className="mt-4 flex items-center gap-2"><span className={`flex items-center gap-0.5 text-[10px] font-bold ${trend.direction==='up'?'text-emerald-600':'text-rose-500'}`}>{trend.direction==='up'?<ArrowUpRight size={13}/>:<ArrowDownRight size={13}/>} {trend.value}</span><span className="text-[10px] text-slate-400">{trend.label}</span></div><p className="mt-1 text-[10px] text-slate-400">{detail}</p></Card>; }
-function PanelTitle({title,action,href}:{title:string;action:string;href:string}) { return <div className="flex items-center justify-between"><h2 className="text-sm font-bold text-slate-800">{title}</h2><Link href={href} className="text-[11px] font-semibold text-[#6757e8]">{action}</Link></div>; }
-function Upcoming({icon,title,meta,tone}:{icon:React.ReactNode;title:string;meta:string;tone:'violet'|'blue'|'amber'}) { return <div className="flex items-center gap-3"><div className={`grid h-8 w-8 place-items-center rounded-lg ${tone==='violet'?'bg-[#f1efff] text-[#6757e8]':tone==='blue'?'bg-[#edf7ff] text-sky-600':'bg-[#fff7e6] text-amber-600'}`}>{icon}</div><div><p className="text-xs font-semibold text-slate-700">{title}</p><p className="mt-0.5 text-[10px] text-slate-400">{meta}</p></div></div>; }
-function ChartIcon() { return <span className="text-base">◔</span>; }
-function BriefcaseIcon() { return <span className="text-base">▣</span>; }
+export default function DashboardPage() {
+  const ws = useWorkspace();
+  const account = useAccount();
+  const update = useAppStore((s) => s.update);
+  const today = isoDate();
+  const active = activeEmployees(ws);
+  const away = active.filter((e) => onLeave(ws, e.id)).length;
+  const openJobs = ws.jobs.filter((j) => j.status === 'Open').length;
+  const upcoming = [
+    ...ws.interviews.filter((i) => i.status === 'Scheduled' && i.at.slice(0, 10) >= today).map((i) => ({ id: i.id, date: i.at.slice(0, 10), text: `Interview: ${ws.candidates.find((c) => c.id === i.candidateId)?.name ?? 'Candidate'}` })),
+    ...ws.leave.filter((r) => r.status === 'Approved' && r.start >= today).map((r) => { const e = ws.employees.find((x) => x.id === r.employeeId); return { id: r.id, date: r.start, text: `${e?.firstName ?? 'Employee'} starts ${r.type.toLowerCase()} leave` }; }),
+  ].sort((a, b) => a.date.localeCompare(b.date)).slice(0, 5);
+  const isEmpty = !ws.employees.length && !ws.jobs.length && !ws.departments.length;
+
+  return <Page title={`${greeting()}, ${account?.name.split(' ')[0] ?? ''}`} description={new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+    action={<Link href="/employees/new" className={buttonClass}><Plus size={16} /> Add employee</Link>}>
+    {isEmpty && <Card className="mb-5 flex flex-col items-start justify-between gap-3 p-5 sm:flex-row sm:items-center">
+      <div><h2 className="text-sm font-bold text-slate-800">Your workspace is empty</h2><p className="mt-1 text-xs text-slate-500">Add your first employee, or load example records to look around. You can clear them in Settings.</p></div>
+      <Button variant="ghost" onClick={() => update(() => sampleData())}>Load sample data</Button>
+    </Card>}
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <Stat label="Active employees" value={active.length} detail={`${ws.departments.length} departments`} />
+      <Stat label="On leave today" value={away} detail={`Pending requests: ${ws.leave.filter((r) => r.status === 'Pending').length}`} />
+      <Stat label="Attrition rate" value={`${attritionRate(ws.employees).toFixed(1)}%`} detail="Last 12 months" />
+      <Stat label="Open positions" value={openJobs} detail={`Candidates in progress: ${ws.candidates.filter((c) => c.stage !== 'Hired' && c.stage !== 'Rejected').length}`} />
+    </div>
+    <div className="mt-5 grid gap-5 xl:grid-cols-[1.6fr_1fr]">
+      <Card className="p-5"><h2 className="text-sm font-bold text-slate-800">Joiners and leavers</h2><p className="mb-3 mt-1 text-xs text-slate-400">Last 12 months</p><HiringChart data={hiringTrend(ws.employees)} /></Card>
+      <Card className="p-5"><h2 className="text-sm font-bold text-slate-800">Headcount by department</h2><p className="mb-3 mt-1 text-xs text-slate-400">Active employees</p>{active.length ? <DepartmentChart data={headcountByDepartment(ws)} /> : <p className="py-16 text-center text-xs text-slate-400">No employees yet</p>}</Card>
+    </div>
+    <div className="mt-5 grid gap-5 xl:grid-cols-2">
+      <Card className="p-5"><h2 className="mb-4 text-sm font-bold text-slate-800">Upcoming</h2>{upcoming.length ? <ul className="space-y-3">{upcoming.map((u) => <li key={u.id} className="flex justify-between gap-3 text-xs"><span className="font-medium text-slate-700">{u.text}</span><span className="shrink-0 text-slate-400">{formatDate(u.date)}</span></li>)}</ul> : <p className="text-xs text-slate-400">Nothing scheduled.</p>}</Card>
+      <Card className="p-5"><h2 className="mb-4 text-sm font-bold text-slate-800">Recent activity</h2>{ws.activities.length ? <ul className="space-y-3">{ws.activities.slice(0, 6).map((a) => <li key={a.id} className="flex justify-between gap-3 text-xs"><span className="font-medium text-slate-700">{a.text}</span><span className="shrink-0 text-slate-400">{formatDate(isoDate(new Date(a.at)))}</span></li>)}</ul> : <p className="text-xs text-slate-400">Changes you make will appear here.</p>}</Card>
+    </div>
+  </Page>;
+}

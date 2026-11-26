@@ -1,7 +1,48 @@
 'use client';
 import Link from 'next/link';
-import { Bell, ChevronDown, Command, Search, Sun, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Bell, LogOut, Menu, Search } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { navGroups } from '@/config/nav';
+import { fullName } from '@/lib/stats';
+import { initials } from '@/lib/utils';
+import { useAccount, useAppStore, useWorkspace } from '@/stores/app';
 
-export function Topbar() { const [searchOpen,setSearchOpen]=useState(false); const [dark,setDark]=useState(false); useEffect(()=>{ const onKey=(event:KeyboardEvent)=>{if((event.metaKey||event.ctrlKey)&&event.key.toLowerCase()==='k'){event.preventDefault();setSearchOpen(true)}}; window.addEventListener('keydown',onKey); return ()=>window.removeEventListener('keydown',onKey)},[]); return <header className="relative sticky top-0 z-20 flex h-[72px] items-center justify-between border-b border-[#e8eaf1] bg-white/90 px-5 backdrop-blur sm:px-8 lg:px-10"><div className="hidden items-center gap-2 text-xs text-slate-400 sm:flex"><span>Monday, December 16, 2024</span><span className="text-slate-300">·</span><span>Good morning, Priya</span></div><div className="flex w-full items-center justify-end gap-2 sm:w-auto sm:gap-4"><button onClick={()=>setSearchOpen(true)} aria-label="Search" className="hidden h-9 w-64 items-center gap-2 rounded-lg border border-[#ececf2] bg-[#fafafd] px-3 text-slate-400 hover:border-[#d7d2fb] md:flex"><Search size={16}/><span className="flex-1 text-left text-xs">Search anything</span><kbd className="flex items-center gap-0.5 rounded border border-slate-200 bg-white px-1.5 py-0.5 text-[10px]"><Command size={10}/>K</kbd></button><button onClick={()=>setSearchOpen(true)} aria-label="Search" className="rounded-lg p-2.5 text-slate-500 hover:bg-slate-50 md:hidden"><Search size={18}/></button><button onClick={()=>{setDark(!dark);document.documentElement.classList.toggle('dark',!dark)}} aria-label="Toggle theme" className="rounded-lg p-2.5 text-slate-500 hover:bg-slate-50"><Sun size={18}/></button><Link href="/leave" aria-label="Notifications" className="relative rounded-lg p-2.5 text-slate-500 hover:bg-slate-50"><Bell size={18}/><span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-rose-500"/></Link><Link href="/settings" className="ml-1 flex items-center gap-2 border-l border-[#ececf2] pl-3"><div className="grid h-8 w-8 place-items-center rounded-full bg-[#e9e7fc] text-xs font-bold text-[#6757e8]">PS</div><div className="hidden text-left sm:block"><p className="text-xs font-semibold text-slate-700">Priya Shah</p><p className="text-[10px] text-slate-400">Administrator</p></div><ChevronDown size={15} className="text-slate-400"/></Link></div>{searchOpen && <div className="absolute right-5 top-[64px] z-30 w-[min(380px,calc(100vw-40px))] rounded-xl border border-[#e8eaf1] bg-white p-3 shadow-xl sm:right-8 lg:right-10"><div className="flex items-center gap-2 border-b border-[#eef0f4] px-2 pb-3"><Search size={15} className="text-slate-400"/><input autoFocus placeholder="Search workspace" className="flex-1 text-xs outline-none"/><button onClick={()=>setSearchOpen(false)} aria-label="Close search"><X size={15} className="text-slate-400"/></button></div><div className="mt-2 space-y-1"><SearchLink href="/employees" label="Search employees"/><SearchLink href="/leave" label="Review leave requests"/><SearchLink href="/reports" label="Open reports"/></div></div>}</header>; }
-function SearchLink({href,label}:{href:string;label:string}) { return <Link href={href} className="block rounded-lg px-3 py-2 text-xs text-slate-600 hover:bg-[#f7f6ff] hover:text-[#6757e8]">{label}</Link>; }
+export function Topbar({ onMenu }: { onMenu: () => void }) {
+  const account = useAccount();
+  const ws = useWorkspace();
+  const signOut = useAppStore((s) => s.signOut);
+  const [query, setQuery] = useState('');
+  const input = useRef<HTMLInputElement>(null);
+  const pending = ws.leave.filter((r) => r.status === 'Pending').length;
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); input.current?.focus(); }
+      if (event.key === 'Escape') setQuery('');
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  const term = query.trim().toLowerCase();
+  const results = term ? [
+    ...navGroups.flatMap((g) => g.items).map((i) => ({ href: i.href, label: i.label, hint: 'Page' })),
+    ...ws.employees.map((e) => ({ href: `/employees/${e.id}`, label: fullName(e), hint: e.role })),
+  ].filter((r) => `${r.label} ${r.hint}`.toLowerCase().includes(term)).slice(0, 8) : [];
+
+  return <header className="sticky top-0 z-20 flex h-[72px] items-center gap-3 border-b border-[#e8eaf1] bg-white px-5 sm:px-8 lg:px-10">
+    <button aria-label="Open navigation" onClick={onMenu} className="text-slate-500 lg:hidden"><Menu size={20} /></button>
+    <div className="relative min-w-0 max-w-sm flex-1">
+      <div className="flex h-9 items-center gap-2 rounded-lg border border-[#ececf2] bg-[#fafafd] px-3 text-slate-400"><Search size={16} /><input ref={input} value={query} onChange={(e) => setQuery(e.target.value)} aria-label="Search" placeholder="Search people and pages" className="w-full bg-transparent text-xs text-slate-700 outline-none" /></div>
+      {term && <div className="absolute inset-x-0 top-11 rounded-xl border border-[#e8eaf1] bg-white p-2 shadow-xl">
+        {results.map((r) => <Link key={r.href} href={r.href} onClick={() => setQuery('')} className="flex justify-between gap-3 rounded-lg px-3 py-2 text-xs text-slate-700 hover:bg-[#f7f6ff]"><span>{r.label}</span><span className="truncate text-slate-400">{r.hint}</span></Link>)}
+        {!results.length && <p className="px-3 py-2 text-xs text-slate-400">No matches</p>}
+      </div>}
+    </div>
+    <div className="ml-auto flex items-center gap-1 sm:gap-3">
+      <Link href="/leave" aria-label={`${pending} pending leave requests`} className="relative rounded-lg p-2.5 text-slate-500 hover:bg-slate-50"><Bell size={18} />{pending > 0 && <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-rose-500" />}</Link>
+      <Link href="/settings" className="flex items-center gap-2 border-l border-[#ececf2] pl-3"><span className="grid h-8 w-8 place-items-center rounded-full bg-[#e9e7fc] text-xs font-bold text-[#6757e8]">{initials(account?.name ?? '')}</span><span className="hidden text-left md:block"><span className="block text-xs font-semibold text-slate-700">{account?.name}</span><span className="block text-[10px] text-slate-400">{account?.email}</span></span></Link>
+      <button onClick={signOut} aria-label="Sign out" title="Sign out" className="rounded-lg p-2.5 text-slate-500 hover:bg-slate-50"><LogOut size={18} /></button>
+    </div>
+  </header>;
+}

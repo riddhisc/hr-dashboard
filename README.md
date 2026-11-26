@@ -12,7 +12,11 @@ copy .env.example .env.local
 pnpm dev
 ```
 
-Open `http://localhost:3000`. The demo workspace is available without a database connection.
+Open `http://localhost:3000` and create an account. No database is needed.
+
+## Accounts and data
+
+Accounts, sessions, and workspace records are stored in the browser (localStorage). Passwords are salted and hashed, but this is not server-side authentication: data does not sync between devices or users, and clearing site data deletes it. Add a database and server authentication before storing real employee information.
 
 ## Scripts
 
@@ -26,11 +30,11 @@ Open `http://localhost:3000`. The demo workspace is available without a database
 
 ## Environment
 
-Copy `.env.example` to `.env.local` and set `DATABASE_URL` for Neon Postgres and `AUTH_SECRET` for Auth.js. The current reviewable dashboard uses seeded demo data while the database/auth integration is being migrated.
+Copy `.env.example` to `.env.local` and set `DATABASE_URL` for Neon Postgres and `AUTH_SECRET` for Auth.js. The app does not read these yet; they are reserved for the database/auth integration.
 
 ## Routes
 
-The App Router includes the overview dashboard, employees, departments, attendance, leave, payroll, recruitment, performance, reports, analytics, settings, and a login screen. Legacy ATS areas remain represented at `/jobs`, `/applicants`, and `/interviews` while their data services are migrated.
+`/login` and `/signup`, then `/dashboard`, `/employees` (with `/employees/new` and `/employees/[id]`), `/departments`, `/attendance`, `/leave`, `/payroll`, `/recruitment`, `/jobs`, `/applicants`, `/interviews`, `/performance`, `/reports`, `/analytics`, and `/settings`. Each has its own file under `src/app/`.
 
 ## Project structure
 
@@ -38,10 +42,10 @@ The App Router includes the overview dashboard, employees, departments, attendan
 src/app/          routes and layouts
 src/components/   shell, UI primitives, dashboard widgets
 src/features/     domain schemas, services, and actions
-src/config/       navigation and role permissions
+src/config/       navigation
 src/db/           Drizzle schema
-src/lib/          env validation, data, and utilities
-src/stores/       Zustand UI state
+src/lib/          types, calculations, sample data, and utilities
+src/stores/       Zustand store (accounts and workspace data)
 docs/             audit, architecture, decisions, performance
 ```
 
@@ -54,4 +58,4 @@ pnpm dlx vercel login
 pnpm dlx vercel --prod
 ```
 
-Set `AUTH_SECRET`, `NEXT_PUBLIC_APP_URL`, and `DATABASE_URL` in the Vercel project settings. The current demo works without `DATABASE_URL`; Neon persistence becomes active once that variable is configured.
+Set `AUTH_SECRET`, `NEXT_PUBLIC_APP_URL`, and `DATABASE_URL` in the Vercel project settings. The app currently runs without any of them.
