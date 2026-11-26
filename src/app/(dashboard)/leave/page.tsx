@@ -23,6 +23,8 @@ export default function LeavePage() {
     const form = event.currentTarget;
     const v = formValues(form);
     if (v.end < v.start) return void toast.error('End date must be on or after the start date');
+    const joined = ws.employees.find((e) => e.id === v.employeeId)?.startDate;
+    if (joined && v.start < joined) return void toast.error('Leave cannot start before the employee\'s start date');
     if (!workingDays(v.start, v.end)) return void toast.error('Those dates contain no working days');
     if (ws.leave.some((r) => r.employeeId === v.employeeId && r.status !== 'Declined' && r.start <= v.end && r.end >= v.start)) return void toast.error('This overlaps an existing request');
     const request: LeaveRequest = { id: newId(), employeeId: v.employeeId, type: v.type as LeaveType, start: v.start, end: v.end, reason: v.reason, status: 'Pending' };
@@ -43,13 +45,13 @@ export default function LeavePage() {
 
   return <Page title="Leave" description="Requests, approvals, and balances.">
     {!ws.employees.length ? <Empty title="No employees yet" hint="Add employees before recording leave." href="/employees/new" action="Add employee" /> : <div className="space-y-5">
-      <Card className="p-5"><h2 className="mb-4 text-sm font-bold text-slate-800">New request</h2><form onSubmit={submit} className="grid items-end gap-3 sm:grid-cols-2 xl:grid-cols-6">
+      <Card className="p-5"><h2 className="mb-4 text-sm font-bold text-slate-800">New request</h2><form onSubmit={submit} className="grid items-start gap-3 sm:grid-cols-2 xl:grid-cols-6">
         <SelectField name="employeeId" label="Employee" options={staff.map((e) => ({ value: e.id, label: fullName(e) }))} />
         <SelectField name="type" label="Type" options={types} />
-        <Field name="start" type="date" label="From" defaultValue={isoDate()} />
-        <Field name="end" type="date" label="To" defaultValue={isoDate()} />
+        <Field name="start" type="date" label="From" min={`${year - 1}-01-01`} max={`${year + 1}-12-31`} defaultValue={isoDate()} />
+        <Field name="end" type="date" label="To" min={`${year - 1}-01-01`} max={`${year + 1}-12-31`} defaultValue={isoDate()} />
         <Field name="reason" label="Reason (optional)" required={false} maxLength={500} />
-        <Button type="submit" disabled={!staff.length}>Submit request</Button>
+        <Button type="submit" className="sm:mt-6" disabled={!staff.length}>Submit request</Button>
       </form></Card>
       {!ws.leave.length ? <Empty title="No leave requests" hint="Submitted requests appear here for approval." /> :
         <Table head={['Employee', 'Type', 'Dates', 'Days', 'Status', '']}>{ws.leave.map((r) => <tr key={r.id}><td><span className="font-semibold">{nameOf(r.employeeId)}</span>{r.reason && <p className="text-[11px] text-slate-400">{r.reason}</p>}</td><td>{r.type}</td><td>{formatDate(r.start)} – {formatDate(r.end)}</td><td>{workingDays(r.start, r.end)}</td>

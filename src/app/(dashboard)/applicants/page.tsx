@@ -1,4 +1,5 @@
 'use client';
+import { email, personName } from '@/lib/validation';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { Card } from '@/components/ui/card';
@@ -17,17 +18,17 @@ export default function ApplicantsPage() {
   const rows = ws.candidates.filter((c) => `${c.name} ${c.email} ${jobTitle(c.jobId)}`.toLowerCase().includes(query.toLowerCase()));
   return <Page title="Applicants" description="Everyone who has applied to your roles.">
     {!open.length && !ws.candidates.length ? <Empty title="No open jobs" hint="Create a job before adding applicants." href="/jobs" action="Go to jobs" /> : <div className="space-y-4">
-      {open.length > 0 && <Card className="p-5"><form className="grid items-end gap-3 sm:grid-cols-2 xl:grid-cols-4" onSubmit={(event) => {
+      {open.length > 0 && <Card className="p-5"><form className="grid items-start gap-3 sm:grid-cols-2 xl:grid-cols-4" onSubmit={(event) => {
         event.preventDefault();
         const form = event.currentTarget;
         const v = formValues(form);
-        const email = v.email.toLowerCase();
+        const address = v.email.toLowerCase();
         if (!v.name) return;
-        if (ws.candidates.some((c) => c.email === email && c.jobId === v.jobId)) return void toast.error('This person has already applied for that job');
-        update((w) => ({ candidates: [{ id: newId(), name: v.name, email, jobId: v.jobId, stage: 'Applied' }, ...w.candidates] }), `${v.name} applied for ${jobTitle(v.jobId)}`);
+        if (ws.candidates.some((c) => c.email === address && c.jobId === v.jobId)) return void toast.error('This person has already applied for that job');
+        update((w) => ({ candidates: [{ id: newId(), name: v.name, email: address, jobId: v.jobId, stage: 'Applied' }, ...w.candidates] }), `${v.name} applied for ${jobTitle(v.jobId)}`);
         form.reset();
       }}>
-        <Field name="name" label="Full name" /><Field name="email" type="email" label="Email" /><SelectField name="jobId" label="Job" options={open.map((j) => ({ value: j.id, label: j.title }))} /><Button type="submit">Add applicant</Button>
+        <Field name="name" label="Full name" check={personName('Full name')} /><Field name="email" type="email" label="Email" check={email} /><SelectField name="jobId" label="Job" options={open.map((j) => ({ value: j.id, label: j.title }))} /><Button type="submit" className="sm:mt-6">Add applicant</Button>
       </form></Card>}
       {!ws.candidates.length ? <Empty title="No applicants yet" hint="Applicants you add appear here and on the recruitment board." /> : <>
         <input aria-label="Search applicants" placeholder="Search by name, email, or job" value={query} onChange={(e) => setQuery(e.target.value)} className={controlClass} />

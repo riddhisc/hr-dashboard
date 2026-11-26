@@ -1,11 +1,12 @@
 'use client';
+import { personName } from '@/lib/validation';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Button, Field, SelectField, formValues } from '@/components/ui/form';
 import { Empty, Page, Table } from '@/components/ui/page';
 import type { InterviewStatus } from '@/lib/types';
-import { newId } from '@/lib/utils';
+import { isoDate, newId } from '@/lib/utils';
 import { useAppStore, useWorkspace } from '@/stores/app';
 
 export default function InterviewsPage() {
@@ -16,7 +17,7 @@ export default function InterviewsPage() {
   const setStatus = (id: string, candidateId: string, status: InterviewStatus) => update((w) => ({ interviews: w.interviews.map((i) => i.id === id ? { ...i, status } : i) }), `Interview with ${nameOf(candidateId)} was ${status.toLowerCase()}`);
   return <Page title="Interviews" description="Schedule interviews and track their outcome.">
     {!eligible.length && !ws.interviews.length ? <Empty title="No candidates to interview" hint="Add an applicant first." href="/applicants" action="Go to applicants" /> : <div className="space-y-4">
-      {eligible.length > 0 && <Card className="p-5"><form className="grid items-end gap-3 sm:grid-cols-2 xl:grid-cols-4" onSubmit={(event) => {
+      {eligible.length > 0 && <Card className="p-5"><form className="grid items-start gap-3 sm:grid-cols-2 xl:grid-cols-4" onSubmit={(event) => {
         event.preventDefault();
         const form = event.currentTarget;
         const v = formValues(form);
@@ -25,7 +26,7 @@ export default function InterviewsPage() {
         update((w) => ({ interviews: [...w.interviews, { id: newId(), candidateId: v.candidateId, interviewer: v.interviewer, at: v.at, status: 'Scheduled' }], candidates: w.candidates.map((c) => c.id === v.candidateId && (c.stage === 'Applied' || c.stage === 'Screening') ? { ...c, stage: 'Interview' } : c) }), `Interview scheduled with ${nameOf(v.candidateId)}`);
         form.reset();
       }}>
-        <SelectField name="candidateId" label="Candidate" options={eligible.map((c) => ({ value: c.id, label: c.name }))} /><Field name="interviewer" label="Interviewer" list="interviewers" /><datalist id="interviewers">{ws.employees.map((e) => <option key={e.id} value={`${e.firstName} ${e.lastName}`} />)}</datalist><Field name="at" type="datetime-local" label="Date and time" /><Button type="submit">Schedule</Button>
+        <SelectField name="candidateId" label="Candidate" options={eligible.map((c) => ({ value: c.id, label: c.name }))} /><Field name="interviewer" label="Interviewer" check={personName('Interviewer')} list="interviewers" /><datalist id="interviewers">{ws.employees.map((e) => <option key={e.id} value={`${e.firstName} ${e.lastName}`} />)}</datalist><Field name="at" type="datetime-local" label="Date and time" min={`${isoDate()}T${new Date().toTimeString().slice(0, 5)}`} /><Button type="submit" className="sm:mt-6">Schedule</Button>
       </form></Card>}
       {!ws.interviews.length ? <Empty title="No interviews scheduled" hint="Scheduled interviews appear here and on the overview." /> :
         <Table head={['Candidate', 'Interviewer', 'When', 'Status', '']}>{[...ws.interviews].sort((a, b) => a.at.localeCompare(b.at)).map((i) => <tr key={i.id}><td className="font-semibold">{nameOf(i.candidateId)}</td><td>{i.interviewer}</td><td>{new Date(i.at).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })}</td><td><Badge tone={i.status === 'Scheduled' ? 'info' : i.status === 'Completed' ? 'success' : 'default'}>{i.status}</Badge></td>

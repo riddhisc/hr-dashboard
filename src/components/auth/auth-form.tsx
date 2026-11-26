@@ -1,4 +1,5 @@
 'use client';
+import { email, personName, text } from '@/lib/validation';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -34,7 +35,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    const { name = '', company = '', email = '' } = formValues(event.currentTarget);
+    const { name = '', company = '', email: address = '' } = formValues(event.currentTarget);
     // Passwords are read untrimmed so spaces remain part of them.
     const password = String(data.get('password') ?? '');
     if (isSignup && (!name || !company)) return setError('Enter your name and company.');
@@ -42,7 +43,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
     setBusy(true);
     setError('');
     try {
-      const result = isSignup ? await signUp({ name, company, email, password }) : await signIn(email, password);
+      const result = isSignup ? await signUp({ name, company, email: address, password }) : await signIn(address, password);
       if (result.ok) return router.replace('/dashboard');
       setError(result.error);
     } catch {
@@ -74,15 +75,15 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
         <h1 className="text-[28px] font-bold tracking-[-.02em] text-slate-900">{isSignup ? 'Create your account' : 'Welcome back'}</h1>
         <p className="mt-3 text-sm text-slate-500">{isSignup ? 'Set up a Peopleflow workspace for your team.' : 'Sign in to your Peopleflow workspace.'}</p>
         <form onSubmit={submit} className="mt-8 space-y-4">
-          {isSignup && <><Field name="name" label="Full name" autoComplete="name" /><Field name="company" label="Company name" autoComplete="organization" /></>}
-          <Field name="email" type="email" label="Email" autoComplete="email" placeholder="you@company.com" />
+          {isSignup && <><Field name="name" label="Full name" check={personName('Full name')} autoComplete="name" /><Field name="company" label="Company name" check={text('Company name')} autoComplete="organization" /></>}
+          <Field name="email" type="email" label="Email" check={email} autoComplete="email" placeholder="you@company.com" />
           <div className={cn('grid gap-4', isSignup && 'sm:grid-cols-2')}>
             <PasswordField name="password" label="Password" autoComplete={isSignup ? 'new-password' : 'current-password'} pattern={isSignup ? passwordRule : undefined} title={isSignup ? passwordHint : undefined} />
             {isSignup && <PasswordField name="confirm" label="Confirm password" autoComplete="new-password" />}
           </div>
           {isSignup && <p className="!mt-2 text-[11px] text-slate-400">{passwordHint}</p>}
           {error && <p role="alert" className="text-xs font-medium text-rose-600">{error}</p>}
-          <Button type="submit" disabled={busy} className="h-11 w-full bg-[#7b6cf0] text-sm hover:bg-[#6d5ee6]">{busy ? 'Please wait…' : isSignup ? 'Create account' : 'Sign in'}</Button>
+          <Button type="submit" disabled={busy} className="h-11 w-full text-sm">{busy ? 'Please wait…' : isSignup ? 'Create account' : 'Sign in'}</Button>
         </form>
         <p className="mt-5 text-center text-xs text-slate-500">{isSignup ? 'Already have an account?' : 'New to Peopleflow?'} <Link href={isSignup ? '/login' : '/signup'} className="font-semibold text-[#6757e8]">{isSignup ? 'Sign in' : 'Create an account'}</Link></p>
         <p className="mt-3 text-center text-[11px] text-slate-400">Accounts and records are saved in this browser only.</p>

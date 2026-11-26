@@ -1,6 +1,7 @@
 'use client';
+import { text } from '@/lib/validation';
 import { toast } from 'sonner';
-import { Button, controlClass, formValues } from '@/components/ui/form';
+import { Button, Field, formValues } from '@/components/ui/form';
 import { Empty, Page, Table } from '@/components/ui/page';
 import { activeEmployees } from '@/lib/stats';
 import { newId } from '@/lib/utils';
@@ -11,7 +12,7 @@ export default function DepartmentsPage() {
   const update = useAppStore((s) => s.update);
   const active = activeEmployees(ws);
   return <Page title="Departments" description="How your teams are structured.">
-    <form className="mb-4 flex max-w-md gap-2" onSubmit={(event) => {
+    <form className="mb-4 flex max-w-md items-start gap-2" onSubmit={(event) => {
       event.preventDefault();
       const form = event.currentTarget;
       const { name } = formValues(form);
@@ -19,7 +20,7 @@ export default function DepartmentsPage() {
       if (ws.departments.some((d) => d.name.toLowerCase() === name.toLowerCase())) return void toast.error('That department already exists');
       update((w) => ({ departments: [...w.departments, { id: newId(), name }] }), `${name} department was created`);
       form.reset();
-    }}><input name="name" required aria-label="Department name" placeholder="New department name" className={controlClass} /><Button type="submit" className="shrink-0">Add department</Button></form>
+    }}><div className="flex-1"><Field name="name" label="Department name" check={text('Department name')} /></div><Button type="submit" className="mt-6 shrink-0">Add department</Button></form>
     {!ws.departments.length ? <Empty title="No departments yet" hint="Add one above. Departments are also created when you add an employee." /> :
       <Table head={['Department', 'Active employees', '']}>{ws.departments.map((d) => {
         const count = active.filter((e) => e.department === d.name).length;
