@@ -2,8 +2,9 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Eye, EyeOff, Sparkles } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { Button, Field, controlClass, formValues } from '@/components/ui/form';
+import { Logo } from '@/components/ui/logo';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/stores/app';
 
@@ -51,19 +52,23 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
   }
 
   if (!ready) return null;
-  return <main className="grid min-h-screen place-items-center bg-[#e4e6f0] p-3 sm:p-6">
-    <div className="grid w-full max-w-6xl gap-6 rounded-2xl bg-white p-4 sm:p-8 lg:grid-cols-2 lg:gap-12 lg:p-12">
-      <aside className="order-2 flex flex-col rounded-3xl bg-gradient-to-br from-[#f0effe] to-[#dedcfa] p-6 sm:p-9 lg:order-1">
-        <div className="flex items-center gap-2.5 text-lg font-bold text-slate-900"><span className="grid h-8 w-8 place-items-center rounded-xl bg-[#6757e8] text-white"><Sparkles size={17} /></span>peopleflow</div>
-        <h2 className="mt-10 text-3xl font-bold leading-tight tracking-[-.03em] text-slate-900 sm:text-4xl lg:mt-auto lg:pt-10">One workspace for your people</h2>
-        <p className="mt-4 max-w-md text-sm leading-6 text-slate-600">Employees, attendance, leave, payroll, and hiring, kept together.</p>
-        <section aria-labelledby="how-to-use" className="mt-8">
-          <h3 id="how-to-use" className="text-sm font-bold text-slate-900">How to use</h3>
-          <ol className="mt-3 grid gap-3 sm:grid-cols-2">{steps.map((step, index) => <li key={step.title} className="rounded-xl bg-white/70 p-4">
-            <span className="grid h-6 w-6 place-items-center rounded-full bg-[#6757e8] text-[11px] font-bold text-white">{index + 1}</span>
-            <p className="mt-3 text-xs font-bold text-slate-800">{step.title}</p><p className="mt-1 text-[11px] leading-4 text-slate-500">{step.text}</p>
-          </li>)}</ol>
-        </section>
+  return <main className="grid min-h-screen place-items-center bg-[#f5f5fc] p-3 sm:p-6">
+    <div className="grid w-full max-w-6xl gap-6 rounded-3xl border border-[#ececf8] bg-white p-4 shadow-xl shadow-[#7b6cf0]/5 sm:p-8 lg:grid-cols-2 lg:gap-12 lg:p-10">
+      <aside className="relative order-2 overflow-hidden rounded-3xl bg-gradient-to-br from-[#fafaff] via-[#f3f2fe] to-[#e9e7fd] p-6 sm:p-9 lg:order-1">
+        {/* Decorative blocks */}
+        <div aria-hidden="true" className="pointer-events-none absolute right-0 top-0 grid grid-cols-3">{[0, 1, 2, 3, 4, 5, 6, 7, 8].map((n) => <span key={n} className={cn('h-14 w-14', [1, 2, 5].includes(n) && 'bg-[#7b6cf0]/10', n === 4 && 'bg-white/60')} />)}</div>
+        <div className="relative">
+          <Logo className="text-2xl" />
+          <h2 className="mt-12 text-3xl font-bold leading-tight tracking-[-.03em] text-slate-800 sm:text-[40px]">The HR platform for <span className="text-[#7b6cf0]">people teams</span></h2>
+          <p className="mt-4 max-w-md text-sm leading-6 text-slate-500">Manage employees, attendance, leave, payroll, and hiring in one simple workspace.</p>
+          <section aria-labelledby="how-to-use" className="mt-10">
+            <h3 id="how-to-use" className="text-sm font-bold text-slate-800">How to use</h3>
+            <ol className="mt-3 grid gap-3 sm:grid-cols-2">{steps.map((step, index) => <li key={step.title} className="rounded-2xl border border-white bg-white/80 p-4 shadow-sm shadow-[#7b6cf0]/10">
+              <span className="grid h-7 w-7 place-items-center rounded-lg bg-[#ebe9fd] text-xs font-bold text-[#6757e8]">{index + 1}</span>
+              <p className="mt-3 text-xs font-bold text-slate-800">{step.title}</p><p className="mt-1 text-[11px] leading-4 text-slate-500">{step.text}</p>
+            </li>)}</ol>
+          </section>
+        </div>
       </aside>
       <div className="order-1 mx-auto w-full max-w-md self-center py-4 lg:order-2">
         <h1 className="text-[28px] font-bold tracking-[-.02em] text-slate-900">{isSignup ? 'Create your account' : 'Welcome back'}</h1>
@@ -77,7 +82,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
           </div>
           {isSignup && <p className="!mt-2 text-[11px] text-slate-400">{passwordHint}</p>}
           {error && <p role="alert" className="text-xs font-medium text-rose-600">{error}</p>}
-          <Button type="submit" disabled={busy} className="h-11 w-full text-sm">{busy ? 'Please wait…' : isSignup ? 'Create account' : 'Sign in'}</Button>
+          <Button type="submit" disabled={busy} className="h-11 w-full bg-[#7b6cf0] text-sm hover:bg-[#6d5ee6]">{busy ? 'Please wait…' : isSignup ? 'Create account' : 'Sign in'}</Button>
         </form>
         <p className="mt-5 text-center text-xs text-slate-500">{isSignup ? 'Already have an account?' : 'New to Peopleflow?'} <Link href={isSignup ? '/login' : '/signup'} className="font-semibold text-[#6757e8]">{isSignup ? 'Sign in' : 'Create an account'}</Link></p>
         <p className="mt-3 text-center text-[11px] text-slate-400">Accounts and records are saved in this browser only.</p>
