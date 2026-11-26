@@ -5,8 +5,9 @@ test('sign up is required and greets the signed-in user', async ({ page }) => {
   await page.getByRole('link', { name: 'Create an account' }).click();
   await page.getByLabel('Full name').fill('Test User');
   await page.getByLabel('Company name').fill('Test Co');
-  await page.getByLabel('Work email').fill('test@example.com');
-  await page.getByLabel(/Password/).fill('password123');
+  await page.getByLabel('Email').fill('test@example.com');
+  await page.getByLabel('Password', { exact: true }).fill('Password@123');
+  await page.getByLabel('Confirm password', { exact: true }).fill('Password@123');
   await page.getByRole('button', { name: 'Create account' }).click();
   await expect(page.getByRole('heading', { name: /Test/ })).toBeVisible();
   await page.getByRole('link', { name: 'Employees', exact: true }).click();
