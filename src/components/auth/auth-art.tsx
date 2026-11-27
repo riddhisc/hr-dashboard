@@ -1,15 +1,42 @@
-/** Decorative geometric artwork for the sign-in screen. The motion is defined in globals.css. */
+'use client';
+import { useEffect, useState } from 'react';
+import { DOMINO_PIVOT, RADIUS, SCENE_SECONDS, scene } from '@/lib/scene';
+
+/** Plays the sign-in chain reaction once; clicking it plays it again. */
 export function AuthArt() {
-  const delay = (seconds: number) => ({ animationDelay: `-${seconds}s` });
-  return <svg aria-hidden="true" viewBox="0 0 600 220" preserveAspectRatio="xMidYMax slice" className="art h-full w-full">
-    <path className="art-grow" d="M0 220V130a90 90 0 0 1 90 90Z" fill="#ffb4b4" />
-    <rect className="art-grow" style={delay(1.2)} x="90" y="130" width="90" height="90" fill="#1e9be0" />
-    <path className="art-grow" style={delay(2.4)} d="M180 220a90 90 0 0 1 180 0Z" fill="#6d5bd0" />
-    <path className="art-grow" style={delay(3.6)} d="M450 220V100a120 120 0 0 1 120 120Z" fill="#2f2fa8" />
-    <circle className="art-float" style={delay(1)} cx="405" cy="175" r="45" fill="#ffb4b4" />
-    <path className="art-turn" d="M370 142V92a50 50 0 0 1 50 50Z" fill="#8b7bd8" />
-    <circle className="art-float" style={delay(3)} cx="545" cy="125" r="30" fill="#1e9be0" opacity=".85" />
-    <circle className="art-float" style={delay(4.5)} cx="225" cy="108" r="13" fill="#fff" opacity=".35" />
-    <g className="art-turn" style={delay(2)}><circle cx="95" cy="122" r="26" fill="none" stroke="#fff" strokeWidth="8" strokeDasharray="120 44" strokeLinecap="round" opacity=".28" /></g>
-  </svg>;
+  const [time, setTime] = useState(0);
+  const [run, setRun] = useState(0);
+
+  useEffect(() => {
+    // People who turn animations off see the finished picture.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return setTime(SCENE_SECONDS);
+    let frame = 0;
+    let started: number | undefined;
+    const step = (now: number) => {
+      started ??= now;
+      const seconds = (now - started) / 1000;
+      setTime(Math.min(seconds, SCENE_SECONDS));
+      if (seconds < SCENE_SECONDS) frame = requestAnimationFrame(step);
+    };
+    frame = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(frame);
+  }, [run]);
+
+  const { first, block, domino, second } = scene(time);
+  const ball = (name: string, at: typeof first, radius: number, fill: string) =>
+    <g data-part={name} transform={`translate(${at.x} ${at.y}) rotate(${at.spin})`}>
+      <circle r={radius} fill={fill} />
+      <path d={`M0 0V-${radius - 4}`} stroke="#2f2fa8" strokeWidth="4" strokeLinecap="round" />
+    </g>;
+
+  return <button type="button" aria-label="Replay animation" title="Click to replay" onClick={() => { setTime(0); setRun(run + 1); }} className="block h-full w-full cursor-pointer">
+    <svg aria-hidden="true" viewBox="0 0 600 220" preserveAspectRatio="xMidYMax slice" className="h-full w-full">
+      <path d="M0 220V100Q85 220 170 220Z" fill="#6d5bd0" />
+      <path d="M430 220Q515 220 600 100V220Z" fill="#ffb4b4" />
+      <rect data-part="block" x={block} y="160" width="60" height="60" rx="4" fill="#1e9be0" />
+      <rect data-part="domino" x={DOMINO_PIVOT - 16} y="130" width="16" height="90" rx="3" fill="#f47c7c" transform={`rotate(${domino} ${DOMINO_PIVOT} 220)`} />
+      {ball('first', first, RADIUS.first, '#ffc9c9')}
+      {ball('second', second, RADIUS.second, '#7dd3fc')}
+    </svg>
+  </button>;
 }

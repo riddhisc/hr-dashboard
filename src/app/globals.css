@@ -6,21 +6,11 @@ body { margin: 0; min-height: 100vh; background: radial-gradient(circle at 100% 
 @layer base { button, input, select { font: inherit; } }
 .scrollbar-none::-webkit-scrollbar { display:none; }
 .scrollbar-none { scrollbar-width:none; }
-/* Sign-in screen motion. Only runs when the device allows animation. */
+/* The sign-in logo rolls in once and nudges the name. Only when the device allows animation. */
 @media (prefers-reduced-motion: no-preference) {
-  .logo-float { animation: drift 4s ease-in-out infinite; }
-  .logo-float svg { animation: tilt 4s ease-in-out infinite; }
-  .logo-float svg circle { animation: bob 1s ease-in-out infinite alternate; }
-  .logo-float svg circle:nth-of-type(2) { animation-delay: -1s; }
-  .art * { transform-box: fill-box; transform-origin: center; }
-  .art-float { animation: drift 5s ease-in-out infinite; }
-  .art-turn { animation: turn 7s ease-in-out infinite; }
-  .art-grow { animation: grow 5s ease-in-out infinite; }
-  .art .art-grow { transform-origin: bottom; }
+  .logo-roll svg { animation: roll-in 1.4s cubic-bezier(.2, .7, .3, 1) both; }
+  .logo-roll > span > span { animation: nudge 2s ease-out both; }
 }
-@keyframes drift { 0%, 100% { translate: 0 0; } 50% { translate: 8px -14px; } }
-@keyframes tilt { 0%, 100% { rotate: -8deg; } 50% { rotate: 8deg; } }
-@keyframes bob { from { translate: 0 -1.5px; } to { translate: 0 1.5px; } }
-@keyframes turn { 0%, 100% { rotate: 0deg; translate: 0 0; } 50% { rotate: 80deg; translate: -6px -10px; } }
-@keyframes grow { 0%, 100% { scale: 1 1; } 50% { scale: 1 1.18; } }
+@keyframes roll-in { from { translate: -220px 0; rotate: -720deg; } to { translate: 0 0; rotate: 0deg; } }
+@keyframes nudge { 0%, 55% { translate: 0 0; } 70% { translate: 16px 0; } 82% { translate: -4px 0; } 91% { translate: 2px 0; } 100% { translate: 0 0; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior:auto !important; transition-duration:0.01ms !important; animation-duration:0.01ms !important; } }
