@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { Bell, LogOut, Menu, Search } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { navGroups } from '@/config/nav';
+import { searchPages } from '@/config/nav';
 import { fullName } from '@/lib/stats';
 import { initials } from '@/lib/utils';
 import { useAccount, useAppStore, useWorkspace } from '@/stores/app';
@@ -26,7 +26,7 @@ export function Topbar({ onMenu }: { onMenu: () => void }) {
 
   const term = query.trim().toLowerCase();
   const results = term ? [
-    ...navGroups.flatMap((g) => g.items).map((i) => ({ href: i.href, label: i.label, hint: 'Page' })),
+    ...searchPages.map((page) => ({ ...page, hint: 'Page' })),
     ...ws.employees.map((e) => ({ href: `/employees/${e.id}`, label: fullName(e), hint: e.role })),
   ].filter((r) => `${r.label} ${r.hint}`.toLowerCase().includes(term)).slice(0, 8) : [];
 
@@ -40,7 +40,7 @@ export function Topbar({ onMenu }: { onMenu: () => void }) {
       </div>}
     </div>
     <div className="ml-auto flex items-center gap-1 sm:gap-3">
-      <Link href="/leave" aria-label={`${pending} pending leave requests`} className="relative rounded-lg p-2.5 text-slate-500 hover:bg-slate-50"><Bell size={18} />{pending > 0 && <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-rose-500" />}</Link>
+      <Link href="/time-off?tab=leave" aria-label={`${pending} pending leave requests`} className="relative rounded-lg p-2.5 text-slate-500 hover:bg-slate-50"><Bell size={18} />{pending > 0 && <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-rose-500" />}</Link>
       <Link href="/settings" className="flex items-center gap-2 border-l border-[#ececf2] pl-3"><span className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 text-xs font-bold text-white">{initials(account?.name ?? '')}</span><span className="hidden text-left md:block"><span className="block text-xs font-semibold text-slate-700">{account?.name}</span><span className="block text-[10px] text-slate-400">{account?.email}</span></span></Link>
       <button onClick={signOut} className="flex h-9 shrink-0 items-center gap-2 rounded-full border border-rose-200 bg-rose-50 px-3.5 text-xs font-semibold text-rose-700 hover:bg-rose-100"><LogOut size={15} /> Log out</button>
     </div>

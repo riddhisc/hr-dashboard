@@ -1,15 +1,19 @@
 import type { LucideIcon } from 'lucide-react';
-import { BriefcaseBusiness, CalendarCheck, CalendarDays, ChartNoAxesCombined, CircleDollarSign, FileBarChart, Gauge, Goal, HeartHandshake, LayoutGrid, Settings2, UserRound, UserRoundPlus, Users } from 'lucide-react';
-export type NavItem = { label: string; href: string; icon: LucideIcon };
-export const navGroups: { title: string; items: NavItem[] }[] = [
-  { title: 'Workspace', items: [
-    { label: 'Overview', href: '/dashboard', icon: Gauge }, { label: 'Employees', href: '/employees', icon: Users }, { label: 'Departments', href: '/departments', icon: LayoutGrid },
-    { label: 'Attendance', href: '/attendance', icon: CalendarDays }, { label: 'Leave', href: '/leave', icon: HeartHandshake }, { label: 'Payroll', href: '/payroll', icon: CircleDollarSign },
-  ] },
-  { title: 'Hiring', items: [
-    { label: 'Recruitment', href: '/recruitment', icon: UserRoundPlus }, { label: 'Jobs', href: '/jobs', icon: BriefcaseBusiness }, { label: 'Applicants', href: '/applicants', icon: UserRound }, { label: 'Interviews', href: '/interviews', icon: CalendarCheck },
-  ] },
-  { title: 'Insights', items: [
-    { label: 'Performance', href: '/performance', icon: Goal }, { label: 'Reports', href: '/reports', icon: FileBarChart }, { label: 'Analytics', href: '/analytics', icon: ChartNoAxesCombined }, { label: 'Settings', href: '/settings', icon: Settings2 },
-  ] },
+import { ChartNoAxesCombined, CircleDollarSign, Gauge, HeartHandshake, Settings2, UserRoundPlus, Users } from 'lucide-react';
+import { hiringTabs, insightsTabs, peopleTabs, timeOffTabs, type Tab } from './tabs';
+
+export type NavItem = { label: string; href: string; icon: LucideIcon; tone: string; tabs?: readonly Tab[]; /** Other paths that belong to this item. */ also?: string };
+export const navItems: NavItem[] = [
+  { label: 'Overview', href: '/dashboard', icon: Gauge, tone: 'bg-blue-100 text-blue-700' },
+  { label: 'People', href: '/people', icon: Users, tone: 'bg-blue-100 text-blue-700', tabs: peopleTabs, also: '/employees' },
+  { label: 'Time off', href: '/time-off', icon: HeartHandshake, tone: 'bg-sky-100 text-sky-700', tabs: timeOffTabs },
+  { label: 'Hiring', href: '/hiring', icon: UserRoundPlus, tone: 'bg-pink-100 text-pink-700', tabs: hiringTabs },
+  { label: 'Insights', href: '/insights', icon: ChartNoAxesCombined, tone: 'bg-sky-100 text-sky-700', tabs: insightsTabs },
+  { label: 'Payroll', href: '/payroll', icon: CircleDollarSign, tone: 'bg-blue-100 text-blue-700' },
+  { label: 'Settings', href: '/settings', icon: Settings2, tone: 'bg-indigo-100 text-indigo-700' },
 ];
+/** Every page and tab, for the top bar search. */
+export const searchPages: { href: string; label: string }[] = navItems.flatMap((item) => [
+  { href: item.href, label: item.label },
+  ...(item.tabs ?? []).map((tab) => ({ href: `${item.href}?tab=${tab.id}`, label: tab.label })),
+]);

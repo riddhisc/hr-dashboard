@@ -11,9 +11,9 @@ import { formatDate, greeting, isoDate } from '@/lib/utils';
 import { useAccount, useAppStore, useWorkspace } from '@/stores/app';
 
 const shortcuts = [
-  { href: '/attendance', label: 'Mark attendance', icon: CalendarDays, tone: 'bg-sky-100 text-sky-700' },
-  { href: '/leave', label: 'Review leave', icon: HeartHandshake, tone: 'bg-pink-100 text-pink-700' },
-  { href: '/jobs', label: 'Create a job', icon: BriefcaseBusiness, tone: 'bg-emerald-100 text-emerald-700' },
+  { href: '/time-off?tab=attendance', label: 'Mark attendance', icon: CalendarDays, tone: 'bg-sky-100 text-sky-700' },
+  { href: '/time-off?tab=leave', label: 'Review leave', icon: HeartHandshake, tone: 'bg-pink-100 text-pink-700' },
+  { href: '/hiring?tab=jobs', label: 'Create a job', icon: BriefcaseBusiness, tone: 'bg-emerald-100 text-emerald-700' },
 ];
 
 export default function DashboardPage() {

@@ -10,6 +10,8 @@ test('sign up is required and greets the signed-in user', async ({ page }) => {
   await page.getByLabel('Confirm password', { exact: true }).fill('Password@123');
   await page.getByRole('button', { name: 'Create account' }).click();
   await expect(page.getByRole('heading', { name: /Test/ })).toBeVisible();
-  await page.getByRole('link', { name: 'Employees', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Employees', exact: true })).toBeVisible();
+  await page.getByRole('link', { name: 'People', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'People', exact: true })).toBeVisible();
+  await page.goto('/jobs');
+  await expect(page).toHaveURL(/\/hiring\?tab=jobs/);
 });

@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Button, Field, SelectField, formValues } from '@/components/ui/form';
-import { Empty, Page, Table } from '@/components/ui/page';
+import { Empty, Table } from '@/components/ui/page';
 import { activeEmployees, fullName, leaveUsed, workingDays } from '@/lib/stats';
 import type { LeaveRequest, LeaveStatus, LeaveType } from '@/lib/types';
 import { formatDate, isoDate, newId } from '@/lib/utils';
@@ -11,7 +11,7 @@ import { useAppStore, useWorkspace } from '@/stores/app';
 
 const types: LeaveType[] = ['Annual', 'Sick', 'Personal'];
 
-export default function LeavePage() {
+export function LeaveTab() {
   const ws = useWorkspace();
   const update = useAppStore((s) => s.update);
   const staff = activeEmployees(ws);
@@ -43,7 +43,7 @@ export default function LeavePage() {
     update((w) => ({ leave: w.leave.map((r) => r.id === request.id ? { ...r, status } : r) }), `${nameOf(request.employeeId)}'s leave was ${status.toLowerCase()}`);
   }
 
-  return <Page title="Leave" description="Requests, approvals, and balances.">
+  return <>
     {!ws.employees.length ? <Empty title="No employees yet" hint="Add employees before recording leave." href="/employees/new" action="Add employee" /> : <div className="space-y-5">
       <Card className="p-5"><h2 className="mb-4 text-sm font-bold text-slate-800">New request</h2><form onSubmit={submit} className="grid items-start gap-3 sm:grid-cols-2 xl:grid-cols-6">
         <SelectField name="employeeId" label="Employee" options={staff.map((e) => ({ value: e.id, label: fullName(e) }))} />
@@ -60,5 +60,5 @@ export default function LeavePage() {
       <h2 className="text-sm font-bold text-slate-800">Days remaining in {year}</h2>
       <Table head={['Employee', ...types]}>{staff.map((e) => <tr key={e.id}><td className="font-semibold">{fullName(e)}</td>{types.map((t) => <td key={t}>{ws.settings.leaveAllowance[t] - leaveUsed(ws.leave, e.id, t, year)} of {ws.settings.leaveAllowance[t]}</td>)}</tr>)}</Table>
     </div>}
-  </Page>;
+  </>;
 }

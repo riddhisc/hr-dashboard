@@ -4,19 +4,20 @@ import { useState } from 'react';
 import { Download, Plus } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonClass, controlClass } from '@/components/ui/form';
-import { Empty, Page, Table } from '@/components/ui/page';
+import { Empty, Table } from '@/components/ui/page';
 import { fullName, onLeave } from '@/lib/stats';
 import { downloadCsv, initials } from '@/lib/utils';
 import { useWorkspace } from '@/stores/app';
 
 const avatarTones = ['bg-blue-100 text-blue-700', 'bg-pink-100 text-pink-700', 'bg-sky-100 text-sky-700', 'bg-emerald-100 text-emerald-700', 'bg-amber-100 text-amber-800'];
 
-export default function EmployeesPage() {
+export function EmployeesTab() {
   const ws = useWorkspace();
   const [query, setQuery] = useState('');
   const [department, setDepartment] = useState('');
   const rows = ws.employees.filter((e) => (!department || e.department === department) && `${fullName(e)} ${e.role} ${e.email}`.toLowerCase().includes(query.toLowerCase()));
-  return <Page title="Employees" description="Your people, roles, and employee records." action={<Link href="/employees/new" className={buttonClass}><Plus size={16} /> Add employee</Link>}>
+  return <>
+    {ws.employees.length > 0 && <div className="mb-4 flex justify-end"><Link href="/employees/new" className={buttonClass}><Plus size={16} /> Add employee</Link></div>}
     {!ws.employees.length ? <Empty title="No employees yet" hint="Add your first employee to start the directory." href="/employees/new" action="Add employee" /> : <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row">
         <input aria-label="Search employees" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search by name, title, or email" className={controlClass} />
@@ -29,5 +30,5 @@ export default function EmployeesPage() {
       </Table>
       <p className="text-[11px] text-slate-400">Showing {rows.length} of {ws.employees.length}</p>
     </div>}
-  </Page>;
+  </>;
 }

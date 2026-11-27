@@ -1,4 +1,4 @@
-import type { Employee, LeaveRequest, LeaveType, Workspace } from './types';
+import type { Employee, Goal, LeaveRequest, LeaveType, Workspace } from './types';
 import { isoDate } from './utils';
 
 export const fullName = (employee: Employee): string => `${employee.firstName} ${employee.lastName}`;
@@ -49,4 +49,10 @@ export function attritionRate(employees: Employee[], today: Date = new Date()): 
   const inWindow = employees.filter((e) => e.startDate <= to && (!e.endDate || e.endDate > from));
   if (!inWindow.length) return 0;
   return (inWindow.filter((e) => e.endDate && e.endDate <= to).length / inWindow.length) * 100;
+}
+/** One employee's goals, soonest due first, with their completion figures. */
+export function goalsFor(all: Goal[], employeeId: string): { goals: Goal[]; completed: number; average: number } {
+  const goals = all.filter((g) => g.ownerId === employeeId).sort((a, b) => a.due.localeCompare(b.due));
+  const total = goals.reduce((sum, g) => sum + g.progress, 0);
+  return { goals, completed: goals.filter((g) => g.progress === 100).length, average: goals.length ? Math.round(total / goals.length) : 0 };
 }

@@ -2,6 +2,7 @@
 import { useParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { EmployeeForm } from '@/components/employees-form';
+import { EmployeeGoals } from '@/components/people/employee-goals';
 import { Button } from '@/components/ui/form';
 import { Empty, Page } from '@/components/ui/page';
 import { withDepartment } from '@/lib/employees';
@@ -14,7 +15,7 @@ export default function EmployeePage() {
   const ws = useWorkspace();
   const update = useAppStore((s) => s.update);
   const employee = ws.employees.find((e) => e.id === id);
-  if (!employee) return <Empty title="Employee not found" hint="This record does not exist in your workspace." href="/employees" action="Back to employees" />;
+  if (!employee) return <Empty title="Employee not found" hint="This record does not exist in your workspace." href="/people" action="Back to people" />;
   const active = employee.status === 'Active';
   return <Page title={fullName(employee)} description={`${employee.role} · ${employee.department}${employee.endDate ? ` · Left ${employee.endDate}` : ''}`}
     action={<Button variant="ghost" onClick={() => {
@@ -27,5 +28,6 @@ export default function EmployeePage() {
       update((w) => ({ departments, employees: w.employees.map((e) => e.id === id ? { ...e, ...draft } : e) }), `${draft.firstName} ${draft.lastName}'s record was updated`);
       toast.success('Changes saved');
     }} />
+    <EmployeeGoals key={`goals-${employee.id}`} employee={employee} />
   </Page>;
 }

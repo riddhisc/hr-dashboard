@@ -14,7 +14,7 @@ const steps = [
   { title: 'Create your account', text: 'Enter your name, company, email, and a password. Returning users just sign in.' },
   { title: 'Add your team', text: 'Add employees and their departments, or load sample data from the Overview page.' },
   { title: 'Run daily HR work', text: 'Mark attendance, approve leave, finalise payroll, and track hiring.' },
-  { title: 'Review and export', text: 'See trends in Analytics and download CSV files from Reports.' },
+  { title: 'Review and export', text: 'See trends and download CSV reports under Insights.' },
 ];
 const passwordRule = '(?=.*[A-Za-z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}';
 const passwordHint = 'At least 8 characters, including a letter, a number, and a special character.';

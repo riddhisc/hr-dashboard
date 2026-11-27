@@ -18,7 +18,7 @@ export default function NewEmployeePage() {
       const name = `${draft.firstName} ${draft.lastName}`;
       update((w) => ({ departments, employees: [{ ...draft, id: newId(), status: 'Active' }, ...w.employees] }), `${name} was added to ${draft.department}`);
       toast.success(`${name} added`);
-      router.push('/employees');
+      router.push('/people');
     }} />
   </Page>;
 }

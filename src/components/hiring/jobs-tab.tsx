@@ -3,14 +3,14 @@ import { text } from '@/lib/validation';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Button, Field, formValues } from '@/components/ui/form';
-import { Empty, Page, Table } from '@/components/ui/page';
+import { Empty, Table } from '@/components/ui/page';
 import { newId } from '@/lib/utils';
 import { useAppStore, useWorkspace } from '@/stores/app';
 
-export default function JobsPage() {
+export function JobsTab() {
   const ws = useWorkspace();
   const update = useAppStore((s) => s.update);
-  return <Page title="Jobs" description="Open roles you are hiring for.">
+  return <>
     <Card className="mb-5 p-5"><form className="grid items-start gap-3 sm:grid-cols-2 xl:grid-cols-4" onSubmit={(event) => {
       event.preventDefault();
       const form = event.currentTarget;
@@ -25,5 +25,5 @@ export default function JobsPage() {
     {!ws.jobs.length ? <Empty title="No jobs yet" hint="Create a job above, then add applicants to it." /> :
       <Table head={['Title', 'Department', 'Location', 'Applicants', 'Status', '']}>{ws.jobs.map((j) => <tr key={j.id}><td className="font-semibold">{j.title}</td><td>{j.department}</td><td>{j.location}</td><td>{ws.candidates.filter((c) => c.jobId === j.id).length}</td><td><Badge tone={j.status === 'Open' ? 'success' : 'default'}>{j.status}</Badge></td>
         <td className="text-right"><Button variant="ghost" onClick={() => update((w) => ({ jobs: w.jobs.map((x) => x.id === j.id ? { ...x, status: x.status === 'Open' ? 'Closed' : 'Open' } : x) }), `${j.title} role was ${j.status === 'Open' ? 'closed' : 'reopened'}`)}>{j.status === 'Open' ? 'Close' : 'Reopen'}</Button></td></tr>)}</Table>}
-  </Page>;
+  </>;
 }
