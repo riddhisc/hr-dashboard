@@ -2,7 +2,6 @@ import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]): string { return twMerge(clsx(inputs)); }
-export function formatNumber(value: number): string { return new Intl.NumberFormat('en-US').format(value); }
 export function newId(): string { return crypto.randomUUID(); }
 
 /** Local calendar date as yyyy-mm-dd (toISOString would shift the day in non-UTC zones). */

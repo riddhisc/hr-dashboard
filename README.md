@@ -1,6 +1,6 @@
 # Peopleflow HR
 
-Peopleflow is a modern HR workspace migrated from the original React/Vite ATS. The new runtime is Next.js App Router with strict TypeScript, Tailwind CSS, Recharts, Zustand UI state, Zod schemas, and Drizzle/Postgres scaffolding.
+Peopleflow is a modern HR workspace migrated from the original React/Vite ATS. The new runtime is Next.js App Router with strict TypeScript, Tailwind CSS, Recharts, a Zustand store, and Zod schemas.
 
 ## Run locally
 
