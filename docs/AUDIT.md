@@ -1,4 +1,6 @@
-# Phase 0 Audit
+# Phase 0 Audit (historical)
+
+> Historical record of the old Vite/Express system as it was on 2026-11-16. It does not describe the current app. The old front end is in the git tag `legacy-ats`; the backend is in commit `7901178`. For today see ARCHITECTURE.md.
 
 Date: 2026-11-16
 Repository: `riddhisc/hr-dashboard`

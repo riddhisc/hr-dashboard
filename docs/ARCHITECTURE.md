@@ -1,13 +1,16 @@
 # Architecture
 
-Peopleflow is organized around a thin App Router page layer and domain features. Server Components read through feature services; client components own only interaction state and call TanStack Query hooks or Server Actions. Drizzle is the only database boundary.
+## Runtime
+A Next.js App Router application with no backend of its own. The only route handler is `/api/health`.
 
-```text
-App Router pages
-      ↓
-feature UI → TanStack Query / Server Actions → domain service → Drizzle → Neon Postgres
-      ↓                         ↓
- Zustand (UI-only)        Zod shared schemas
-```
+## Rendering
+`src/app/(dashboard)/layout.tsx` is a client guard: it waits for the browser, redirects to `/login` without a session, and wraps pages in the app shell. Each section page is a server component that reads `?tab=` (`src/config/tabs.ts`) and renders one client tab component.
 
-The shell is shared by the dashboard route group. REST reads live under `src/app/api`; mutations are Server Actions. Permissions are intended to be centralized in `src/config/permissions.ts` as domains are migrated.
+## Data
+`src/stores/app.ts` is a Zustand store. Accounts and one workspace per account persist to `localStorage` under `peopleflow`. The session id is kept in `sessionStorage`. Components read with `useWorkspace()` and write with `update()`. Calculations are pure functions in `src/lib/stats.ts`.
+
+## Security
+Authentication runs entirely in the browser, so it separates accounts on one device but protects nothing from someone with access to that browser. Anyone using the browser can read stored salaries. Server authentication, roles, and a database are required before real data is stored.
+
+## Not built yet
+Database and migrations, server authentication and roles, candidate comparison, interviewer availability, a question bank, CSV import, sorting and pagination, and dark mode.
