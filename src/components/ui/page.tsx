@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Sparkles } from 'lucide-react';
 import { Card } from './card';
-import { buttonClass } from './form';
+import { buttonClass } from './styles';
 
 export function Page({ title, description, action, children }: { title: string; description: string; action?: React.ReactNode; children: React.ReactNode }) {
   return <div className="mx-auto max-w-[1500px]">
