@@ -57,7 +57,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
   return <main className="grid min-h-screen bg-white lg:grid-cols-[1.15fr_1fr]">
     <aside className="order-2 flex flex-col overflow-hidden bg-gradient-to-b from-[#0a6fe0] to-[#2f2fa8] text-white lg:order-1">
       <div className="flex flex-1 flex-col items-center justify-center px-6 py-10 sm:px-12">
-        <Logo inverted className="text-4xl" />
+        <div className="logo-float"><Logo inverted className="text-4xl" /></div>
         <p className="mt-3 text-base text-blue-100">Your people, in flow</p>
         <section aria-labelledby="how-to-use" className="mt-10 w-full max-w-md">
           <h2 id="how-to-use" className="text-sm font-bold">How to use</h2>
@@ -67,7 +67,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
           </li>)}</ol>
         </section>
       </div>
-      <div className="h-36 shrink-0 sm:h-48"><AuthArt /></div>
+      <div className="h-40 shrink-0 sm:h-64"><AuthArt /></div>
     </aside>
     <div className="order-1 flex items-center justify-center px-6 py-12 lg:order-2">
       <div className="w-full max-w-sm">
